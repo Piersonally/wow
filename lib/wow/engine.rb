@@ -8,3 +8,5 @@ module Wow
     # isolate_namespace Wow
   end
 end
+
+require 'wow/battle_net/api_client'
