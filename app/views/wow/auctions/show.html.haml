@@ -1,34 +1,47 @@
-- title "Auction #{@auction.id}"
-%p
-  %b Realm:
-  = @auction.realm_id
-%p
-  %b Auction house:
-  = @auction.auction_house
-%p
-  %b Auc:
-  = @auction.auc
-%p
-  %b Item:
-  = @auction.item
-%p
-  %b Owner:
-  = @auction.owner
-%p
-  %b Owner realm:
-  = @auction.owner_realm
-%p
-  %b Buyout:
-  = @auction.buyout
-%p
-  %b Quantity:
-  = @auction.quantity
-%p
-  %b Rand:
-  = @auction.rand
-%p
-  %b Seed:
-  = @auction.seed
+- title "Auction #{@auction.auc}"
+
+.row
+  .col-sm-6
+    %p
+      %b Item:
+      = @auction.item
+    %p
+      %b Quantity:
+      = @auction.quantity
+    %p
+      %b Buyout:
+      = @auction.buyout
+  .col-sm-6
+    %p
+      %b Auction house:
+      = @auction.realm.name
+      = @auction.auction_house
+    %p
+      %b Owner:
+      = @auction.owner_name
+    %p
+      %b Rand:
+      = @auction.rand
+    %p
+      %b Seed:
+      = @auction.seed
+
+- snapshots = @auction.snapshots.to_a
+%h3 Seen #{snapshots.size} Times:
+
+- if snapshots.size > 0
+  %table.table.table-condensed.table-striped
+    %thead
+      %tr
+        %th Seen At
+        %th Bid
+        %th Time Left
+    %tbody
+      - snapshots.each do |ss|
+        %tr
+          %td= ss.created_at
+          %td= ss.bid
+          %td= ss.time_left
 
 %br
 = link_to 'Edit', edit_wow_auction_path(@auction)
