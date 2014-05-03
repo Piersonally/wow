@@ -14,11 +14,11 @@
         %td= realm.name
         %td
           = link_to "Show", realm, class: "btn btn-xs btn-success"
-          = link_to "Edit", edit_realm_path(realm), class: "btn btn-xs btn-info"
+          = link_to "Edit", edit_wow_realm_path(realm), class: "btn btn-xs btn-info"
           = link_to "Destroy", realm, :method => :delete,
                                :data => { :confirm => "Are you sure?" },
                                class: "btn btn-xs btn-danger"
 
 %br
 
-= link_to "New Realm", new_realm_path, class: "btn btn-primary"
+= link_to "New Realm", new_wow_realm_path, class: "btn btn-primary"

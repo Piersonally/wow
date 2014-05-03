@@ -1,4 +1,6 @@
-Wow::Engine.routes.draw do
+Rails.application.routes.draw do
 
-  resources :realms
+  namespace :wow do
+    resources :realms
+  end
 end
