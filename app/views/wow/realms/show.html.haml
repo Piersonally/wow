@@ -1,0 +1,12 @@
+- title "realm #{@realm.id}"
+%p
+  %b Slug:
+  = @realm.slug
+%p
+  %b Name:
+  = @realm.name
+
+%br
+= link_to 'Edit', edit_realm_path(@realm)
+\|
+= link_to 'Back', realms_path
