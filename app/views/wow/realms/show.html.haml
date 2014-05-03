@@ -5,6 +5,9 @@
 %p
   %b Name:
   = @realm.name
+%p
+  %b Polling Enabled:
+  = @realm.polling_enabled
 
 %br
 = link_to 'Edit', edit_wow_realm_path(@realm)

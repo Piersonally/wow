@@ -47,7 +47,7 @@ module Wow
     end
 
     def realm_params
-      params.require(:realm).permit(:slug, :name)
+      params.require(:realm).permit :slug, :name, :polling_enabled
     end
   end
 end
