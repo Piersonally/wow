@@ -7,11 +7,11 @@ require "wow/version"
 Gem::Specification.new do |s|
   s.name        = "wow"
   s.version     = Wow::VERSION
-  s.authors     = ["TODO: Your name"]
-  s.email       = ["TODO: Your email"]
-  s.homepage    = "TODO"
-  s.summary     = "TODO: Summary of Wow."
-  s.description = "TODO: Description of Wow."
+  s.authors     = ["Sam Pierson"]
+  s.email       = ["gems@sampierson.com"]
+  s.homepage    = ""
+  s.summary     = "WoW Auction Data Mining Plugin"
+  s.description = "WoW Auction Data Mining Plugin"
   s.license     = "MIT"
 
   s.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.rdoc"]
