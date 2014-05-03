@@ -1,0 +1,36 @@
+- title "Auction #{@auction.id}"
+%p
+  %b Realm:
+  = @auction.realm_id
+%p
+  %b Auction house:
+  = @auction.auction_house
+%p
+  %b Auc:
+  = @auction.auc
+%p
+  %b Item:
+  = @auction.item
+%p
+  %b Owner:
+  = @auction.owner
+%p
+  %b Owner realm:
+  = @auction.owner_realm
+%p
+  %b Buyout:
+  = @auction.buyout
+%p
+  %b Quantity:
+  = @auction.quantity
+%p
+  %b Rand:
+  = @auction.rand
+%p
+  %b Seed:
+  = @auction.seed
+
+%br
+= link_to 'Edit', edit_wow_auction_path(@auction)
+\|
+= link_to 'Back', wow_auctions_path

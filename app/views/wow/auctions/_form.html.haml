@@ -1,0 +1,19 @@
+= simple_form_for @auction, as: 'auction',
+                            html: { class: "form-horizontal" },
+                            wrapper: :horizontal_form do |f|
+  = f.error_notification
+
+  .form-inputs
+    = f.input :realm_id, collection: Wow::Realm.all
+    = f.input :auction_house
+    = f.input :auc
+    = f.input :item
+    = f.input :owner
+    = f.input :owner_realm
+    = f.input :buyout
+    = f.input :quantity
+    = f.input :rand
+    = f.input :seed
+
+  .form-actions
+    = f.button :submit, class: "btn btn-primary"

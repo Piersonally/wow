@@ -1,0 +1,38 @@
+- title "Listing Auctions"
+
+%table.table.table-condensed
+  %thead
+    %tr
+      %th Realm
+      %th Auction house
+      %th Auc
+      %th Item
+      %th Owner
+      %th Buyout
+      %th Quantity
+      %th Rand
+      %th Seed
+      %th
+
+  %tbody
+    - @auctions.each do |auction|
+      %tr
+        %td= auction.realm.name
+        %td= auction.auction_house
+        %td= auction.auc
+        %td= auction.item
+        %td= [auction.owner_realm, auction.owner].join '-'
+        %td= auction.buyout
+        %td= auction.quantity
+        %td= auction.rand
+        %td= auction.seed
+        %td
+          = link_to "Show", auction, class: "btn btn-xs btn-success"
+          = link_to "Edit", edit_wow_auction_path(auction), class: "btn btn-xs btn-info"
+          = link_to "Destroy", auction, :method => :delete,
+                               :data => { :confirm => "Are you sure?" },
+                               class: "btn btn-xs btn-danger"
+
+%br
+
+= link_to "New Auction", new_wow_auction_path, class: "btn btn-primary"
