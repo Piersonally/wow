@@ -5,7 +5,9 @@ describe Wow::AuctionsController do
   let!(:auction) { create :auction }
 
   let(:valid_auction_params) {
-    { realm_id: realm.to_param, auc: '123' }.with_indifferent_access
+    { realm_id: realm.to_param, auction_house: 'horde', auc: '1991857830',
+      item: '55714', owner: 'Penloh', owner_realm: 'Baelgun', buyout: '1826700',
+      quantity: '1', rand: '-6', seed: '2094399793' }.with_indifferent_access
   }
   let(:invalid_auction_params) {
     { realm_id: nil }.with_indifferent_access
@@ -13,29 +15,29 @@ describe Wow::AuctionsController do
 
   describe "GET index" do
     it "assigns all auctions as @auctions" do
-      get :index, {}
-      expect(assigns(:auctions)).to eq([auction])
+      get :index
+      expect(assigns :auctions).to eq [auction]
     end
   end
 
   describe "GET show" do
     it "assigns the requested auction as @auction" do
-      get :show, {:id => auction.to_param}
-      expect(assigns(:auction)).to eq(auction)
+      get :show, id: auction.to_param
+      expect(assigns :auction).to eq auction
     end
   end
 
   describe "GET new" do
     it "assigns a new auction as @auction" do
-      get :new, {}
-      expect(assigns(:auction)).to be_a_new(Wow::Auction)
+      get :new
+      expect(assigns :auction).to be_a_new Wow::Auction
     end
   end
 
   describe "GET edit" do
     it "assigns the requested auction as @auction" do
-      get :edit, {:id => auction.to_param}
-      expect(assigns(:auction)).to eq(auction)
+      get :edit, id: auction.to_param
+      expect(assigns :auction).to eq auction
     end
   end
 
@@ -49,13 +51,13 @@ describe Wow::AuctionsController do
 
       describe "and" do
         before { subject }
-        it { expect(assigns(:auction)).to be_a(Wow::Auction) }
-        it { expect(assigns(:auction)).to be_persisted }
+        it { expect(assigns :auction).to be_a Wow::Auction }
+        it { expect(assigns :auction).to be_persisted }
       end
 
       it "redirects to the created auction" do
         subject
-        expect(response).to redirect_to(Wow::Auction.last)
+        expect(response).to redirect_to Wow::Auction.last
       end
     end
 
@@ -63,8 +65,8 @@ describe Wow::AuctionsController do
       let(:auction_params) { invalid_auction_params }
       before { subject }
 
-      it { expect(assigns(:auction)).to be_a_new(Wow::Auction) }
-      it { expect(response).to render_template('new') }
+      it { expect(assigns :auction).to be_a_new Wow::Auction }
+      it { expect(response).to render_template 'new' }
     end
   end
 
@@ -83,8 +85,8 @@ describe Wow::AuctionsController do
       describe "and" do
         before { subject }
 
-        it { expect(assigns(:auction)).to eq(auction) }
-        it { expect(response).to redirect_to(auction) }
+        it { expect(assigns :auction).to eq auction }
+        it { expect(response).to redirect_to auction }
       end
     end
 
@@ -92,21 +94,23 @@ describe Wow::AuctionsController do
       let(:auction_params) { invalid_auction_params }
       before { subject }
 
-      it { expect(assigns(:auction)).to eq(auction) }
-      it { expect(response).to render_template('edit') }
+      it { expect(assigns :auction).to eq auction }
+      it { expect(response).to render_template 'edit' }
     end
   end
 
   describe "DELETE destroy" do
+    subject { delete :destroy, id: auction.to_param }
+
     it "destroys the requested auction" do
       expect {
-        delete :destroy, {:id => auction.to_param}
+        subject
       }.to change(Wow::Auction, :count).by(-1)
     end
 
     it "redirects to the auctions list" do
-      delete :destroy, {:id => auction.to_param}
-      expect(response).to redirect_to(wow_auctions_url)
+      subject
+      expect(response).to redirect_to wow_auctions_url
     end
   end
 end
