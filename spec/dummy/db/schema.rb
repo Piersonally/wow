@@ -29,16 +29,16 @@ ActiveRecord::Schema.define(version: 20140503213807) do
   create_table "wow_auctions", force: true do |t|
     t.integer  "realm_id"
     t.string   "auction_house"
-    t.string   "auc"
     t.integer  "item"
     t.string   "owner"
     t.string   "owner_realm"
-    t.integer  "buyout"
     t.integer  "quantity"
     t.integer  "rand"
-    t.integer  "seed"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "auc",           limit: 8
+    t.integer  "buyout",        limit: 8
+    t.integer  "seed",          limit: 8
   end
 
   add_index "wow_auctions", ["auc"], name: "index_wow_auctions_on_auc", using: :btree
