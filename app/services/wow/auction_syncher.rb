@@ -46,6 +46,7 @@ module Wow
 
     def sync_auctions
       raise "realm is not enabled" unless @realm.polling_enabled?
+      @realm.update last_checked_at: Time.now
       auctions_file = BlizzAuctionsFile.new @realm
       if auctions_file.last_modified_at.to_i == @realm.last_synced_at.to_i
         Rails.logger.info "AuctionSyncher: skipping #{@realm.name}, auctions file update time is still #{@realm.last_synced_at.to_i}"
@@ -62,8 +63,7 @@ module Wow
       auctions_data = auctions_file.retrieve_auction_data
       Wow::Auction.transaction do
         import_auctions auctions_data
-        @realm.update last_checked_at: Time.now,
-                      last_synced_at: auctions_file.last_modified_at
+        @realm.update last_synced_at: auctions_file.last_modified_at
       end
     end
 

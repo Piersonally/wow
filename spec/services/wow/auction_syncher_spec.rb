@@ -79,6 +79,12 @@ describe Wow::AuctionSyncher do
         it "doesn't update the realm last_synced_at" do
           expect { subject }.not_to change(realm, :last_synced_at)
         end
+
+        it "updates the realm's last_checked_at" do
+          realm.update last_checked_at: 1.hour.ago
+          subject
+          expect(realm.last_checked_at).to be_within(5.seconds).of(Time.now)
+        end
       end
 
       context "if the auction data lastModifed is not the same as the realm last-synced_at"  do
