@@ -3,7 +3,7 @@ module Wow
     include Sidekiq::Worker
     include Sidetiq::Schedulable
 
-    recurrence { minutely 30 }
+    recurrence { minutely 5 }
 
     def perform
       Wow::Realm.where(polling_enabled: true).each do |realm|
