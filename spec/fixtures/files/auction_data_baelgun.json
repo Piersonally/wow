@@ -1,0 +1,12 @@
+{
+"realm":{"name":"Baelgun","slug":"baelgun"},
+"alliance":{"auctions":[
+	{"auc":1992121233,"item":36924,"owner":"Ellrond","ownerRealm":"Baelgun","bid":42160,"buyout":49600,"quantity":1,"timeLeft":"VERY_LONG","rand":0,"seed":1454625024},
+	{"auc":1992510611,"item":43674,"owner":"Norius","ownerRealm":"Baelgun","bid":1062330,"buyout":1249800,"quantity":1,"timeLeft":"LONG","rand":0,"seed":653137280},
+	{"auc":1992162901,"item":55373,"owner":"Neffertiti","ownerRealm":"Baelgun","bid":5005716,"buyout":5219684,"quantity":1,"timeLeft":"VERY_LONG","rand":-41,"seed":244449458}]},
+"horde":{"auctions":[
+	{"auc":1991826120,"item":74248,"owner":"Banzi","ownerRealm":"Baelgun","bid":8750000,"buyout":8750000,"quantity":5,"timeLeft":"LONG","rand":0,"seed":1208009557},
+	{"auc":1991857830,"item":55714,"owner":"Penloh","ownerRealm":"Baelgun","bid":1735365,"buyout":1826700,"quantity":1,"timeLeft":"LONG","rand":-6,"seed":2094399793},
+	{"auc":1991734081,"item":37820,"owner":"Bradrystiala","ownerRealm":"Baelgun","bid":2200000,"buyout":2500000,"quantity":1,"timeLeft":"LONG","rand":0,"seed":2111413888}]},
+"neutral":{"auctions":[]}
+}

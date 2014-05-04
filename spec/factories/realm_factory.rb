@@ -6,5 +6,13 @@ FactoryGirl.define do
   factory :realm, class: Wow::Realm do
     name
     slug { |r| r.name }
+
+    factory :enabled_realm do
+      polling_enabled true
+    end
+
+    factory :disabled_realm do
+      polling_enabled false
+    end
   end
 end
