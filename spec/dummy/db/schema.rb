@@ -11,17 +11,17 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140503213807) do
+ActiveRecord::Schema.define(version: 20140504020048) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
   create_table "wow_auction_snapshots", force: true do |t|
     t.integer  "auction_id"
-    t.integer  "bid"
     t.string   "time_left"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "bid",        limit: 8
   end
 
   add_index "wow_auction_snapshots", ["auction_id"], name: "index_wow_auction_snapshots_on_auction_id", using: :btree
@@ -52,6 +52,8 @@ ActiveRecord::Schema.define(version: 20140503213807) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.boolean  "polling_enabled", default: false
+    t.datetime "last_checked_at"
+    t.datetime "last_synced_at"
   end
 
   add_index "wow_realms", ["polling_enabled"], name: "index_wow_realms_on_polling_enabled", using: :btree
