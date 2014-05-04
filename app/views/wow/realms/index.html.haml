@@ -6,6 +6,8 @@
       %th Slug
       %th Name
       %th Polling Enabled
+      %th Last Checked
+      %th Last Synced
       %th
 
   %tbody
@@ -13,6 +15,9 @@
       %tr
         %td= realm.slug
         %td= realm.name
+        %td= realm.polling_enabled
+        %td= realm.last_checked_at
+        %td= realm.last_synced_at
         %td= realm.polling_enabled
         %td
           = link_to "Show", realm, class: "btn btn-xs btn-success"
