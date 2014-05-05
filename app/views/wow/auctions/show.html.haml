@@ -26,7 +26,7 @@
       %b Seed:
       = @auction.seed
 
-- snapshots = @auction.snapshots.to_a
+- snapshots = @auction.snapshots.order(id: :asc).to_a
 %h3 Seen #{snapshots.size} Times:
 
 - if snapshots.size > 0
