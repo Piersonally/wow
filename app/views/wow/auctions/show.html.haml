@@ -10,7 +10,7 @@
       = @auction.quantity
     %p
       %b Buyout:
-      = @auction.buyout
+      = wow_price @auction.buyout
   .col-sm-6
     %p
       %b Auction house:
@@ -40,7 +40,7 @@
       - snapshots.each do |ss|
         %tr
           %td= ss.created_at
-          %td= ss.bid
+          %td= wow_price ss.bid
           %td= ss.time_left
 
 %br
