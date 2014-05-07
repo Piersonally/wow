@@ -5,6 +5,7 @@ require 'foreigner'
 require 'sidekiq'
 require 'sidekiq/exception_handler'
 require 'sidetiq'
+require 'httparty'
 
 module Wow
   class Engine < ::Rails::Engine

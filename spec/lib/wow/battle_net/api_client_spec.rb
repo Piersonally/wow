@@ -8,7 +8,8 @@ describe Wow::BattleNet::ApiClient do
     let(:json_result) { '{"some":"json"}' }
     let!(:get_request_stub) {
       stub_request(:get, "http://us.battle.net/api/wow/auction/data/baelgun?locale=en_US").
-        to_return(:status => 200, :body => json_result, :headers => {})
+        to_return(:status => 200, :body => json_result,
+                  :headers => { 'Content-Type' => 'application/json'} )
     }
 
     context "given a valid realm" do
