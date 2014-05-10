@@ -76,13 +76,15 @@ module Wow
 
     def log_end(auctions_file)
       elapsed_time = Time.now - @start_time
-      Rails.logger.info "AuctionSyncher: completed synch of %s %d in %.1fs" %
-                          [@realm.name, auctions_file.last_modified_at.to_i, elapsed_time]
+      Rails.logger.info "AuctionSyncher: completed synch of %s %d in %.1fs. %d auctions and %d snapshots created." %
+        [
+          @realm.name, auctions_file.last_modified_at.to_i, elapsed_time,
+          @stats[:new_auctions_count], @stats[:snapshots_created_count]
+        ]
     end
 
     def import_auctions(auctions_data)
-      @new_auctions_count = 0
-      @snapshots_created_count = 0
+      @stats = {new_auctions_count: 0, snapshots_created_count: 0}
       @houses_to_import.each do |house|
         import_auctions_for_house house, auctions_data[house]['auctions']
       end
@@ -99,7 +101,7 @@ module Wow
     end
     
     def create_new_auction(house, auction_data)
-      @new_auctions_count += 1
+      @stats[:new_auctions_count] += 1
       @realm.auctions.create!(
         auction_house: house,
         auc:           auction_data['auc'],
@@ -114,7 +116,7 @@ module Wow
     end
 
     def create_snapshot_of_auction(auction, auction_data)
-      @snapshots_created_count += 1
+      @stats[:snapshots_created_count] += 1
       auction.snapshots.create!(
         realm_sync: @sync,
         bid:        auction_data['bid'],
