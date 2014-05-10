@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140504020048) do
+ActiveRecord::Schema.define(version: 20140510203331) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -21,10 +21,12 @@ ActiveRecord::Schema.define(version: 20140504020048) do
     t.string   "time_left"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "bid",        limit: 8
+    t.integer  "bid",           limit: 8
+    t.integer  "realm_sync_id"
   end
 
   add_index "wow_auction_snapshots", ["auction_id"], name: "index_wow_auction_snapshots_on_auction_id", using: :btree
+  add_index "wow_auction_snapshots", ["realm_sync_id"], name: "index_wow_auction_snapshots_on_realm_sync_id", using: :btree
 
   create_table "wow_auctions", force: true do |t|
     t.integer  "realm_id"
@@ -46,6 +48,15 @@ ActiveRecord::Schema.define(version: 20140504020048) do
   add_index "wow_auctions", ["owner", "owner_realm"], name: "index_wow_auctions_on_owner_and_owner_realm", using: :btree
   add_index "wow_auctions", ["realm_id"], name: "index_wow_auctions_on_realm_id", using: :btree
 
+  create_table "wow_realm_syncs", force: true do |t|
+    t.integer  "realm_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "wow_realm_syncs", ["created_at"], name: "index_wow_realm_syncs_on_created_at", using: :btree
+  add_index "wow_realm_syncs", ["realm_id"], name: "index_wow_realm_syncs_on_realm_id", using: :btree
+
   create_table "wow_realms", force: true do |t|
     t.string   "slug"
     t.string   "name"
@@ -59,7 +70,10 @@ ActiveRecord::Schema.define(version: 20140504020048) do
   add_index "wow_realms", ["polling_enabled"], name: "index_wow_realms_on_polling_enabled", using: :btree
 
   add_foreign_key "wow_auction_snapshots", "wow_auctions", name: "wow_auction_snapshots_auction_id_fk", column: "auction_id"
+  add_foreign_key "wow_auction_snapshots", "wow_realm_syncs", name: "wow_auction_snapshots_realm_sync_id_fk", column: "realm_sync_id"
 
   add_foreign_key "wow_auctions", "wow_realms", name: "wow_auctions_realm_id_fk", column: "realm_id"
+
+  add_foreign_key "wow_realm_syncs", "wow_realms", name: "wow_realm_syncs_realm_id_fk", column: "realm_id"
 
 end

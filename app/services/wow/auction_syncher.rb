@@ -61,6 +61,7 @@ module Wow
       log_start auctions_file
       auctions_data = auctions_file.retrieve_auction_data
       Wow::Auction.transaction do
+        @sync = @realm.realm_syncs.create!
         import_auctions auctions_data
         @realm.update last_synced_at: auctions_file.last_modified_at
       end
@@ -70,7 +71,7 @@ module Wow
     def log_start(auctions_file)
       @start_time = Time.now
       Rails.logger.info "AuctionSyncher: starting synch of %s %d at %s" %
-                          [@realm.name, auctions_file.last_modified_at.to_i, start_time]
+                          [@realm.name, auctions_file.last_modified_at.to_i, @start_time]
     end
 
     def log_end(auctions_file)
@@ -115,8 +116,9 @@ module Wow
     def create_snapshot_of_auction(auction, auction_data)
       @snapshots_created_count += 1
       auction.snapshots.create!(
-        bid:       auction_data['bid'],
-        time_left: auction_data['timeLeft']
+        realm_sync: @sync,
+        bid:        auction_data['bid'],
+        time_left:  auction_data['timeLeft']
       )
     end
   end

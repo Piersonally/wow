@@ -8,10 +8,10 @@ describe Wow::AuctionSyncher do
 
     let(:auction_datafile_location_response) {
       {
-        "files" => [
+        'files' => [
           {
-            "url" => "http://us.battle.net/auction-data/e44ae1e38fefbe8d879d6af846d0014f/auctions.json",
-            "lastModified" => auctions_last_modified.to_i * 1000
+            'url' => 'http://us.battle.net/auction-data/e44ae1e38fefbe8d879d6af846d0014f/auctions.json',
+            'lastModified' => auctions_last_modified.to_i * 1000
           }
         ]
       }.to_json
@@ -20,15 +20,21 @@ describe Wow::AuctionSyncher do
     let(:auctions_last_modified) { 1.hour.ago }
 
     let!(:auction_datafile_location_request) do
-      stub_request(:get, "http://us.battle.net/api/wow/auction/data/baelgun?locale=en_US").
-        to_return(:status => 200, :body => auction_datafile_location_response, :headers => {})
+      stub_request(:get, 'http://us.battle.net/api/wow/auction/data/baelgun?locale=en_US').
+        to_return(:status => 200,
+                  :body => auction_datafile_location_response,
+                  :headers => {'Content-Type' => 'application/json'})
     end
 
-    let(:auction_data_response) { IO.read fixture_file_path 'auction_data_baelgun.json' }
+    let(:auction_data_response) {
+      IO.read fixture_file_path 'auction_data_baelgun.json'
+    }
 
     let!(:auction_data_request) do
       stub_request(:get, 'http://us.battle.net/auction-data/e44ae1e38fefbe8d879d6af846d0014f/auctions.json').
-        to_return(:status => 200, :body => auction_data_response, :headers => {})
+        to_return(:status => 200,
+                  :body => auction_data_response,
+                  :headers => { 'Content-Type' => 'application/json'})
     end
 
     context "for a disabled realm" do
@@ -64,8 +70,13 @@ describe Wow::AuctionSyncher do
         expect(auction_datafile_location_request).to have_been_made.once
       end
 
-      context "if the auction data lastModifed is the same as the realm last-synced_at"  do
+      context "if the auction data lastModifed is the same
+                                              as the realm last-synced_at"  do
         before { realm.update last_synced_at: auctions_last_modified }
+
+        it "doesn't create a RealmSync object" do
+          expect { subject }.not_to change(Wow::RealmSync, :count)
+        end
 
         it "doesn't download auction data" do
           subject
@@ -87,8 +98,17 @@ describe Wow::AuctionSyncher do
         end
       end
 
-      context "if the auction data lastModifed is not the same as the realm last-synced_at"  do
+      context "if the auction data lastModifed is not the same
+                                              as the realm last-synced_at"  do
         before { realm.update last_synced_at: 2.hours.ago }
+        let(:sync) { Wow::RealmSync.where(realm_id: realm).last }
+
+        it "creates a RealmSync object" do
+          expect { subject }.to change(Wow::RealmSync, :count).by(1)
+          sync = Wow::RealmSync.last
+          expect(sync.realm).to eq realm
+          expect(sync.created_at).to be_within(5.seconds).of(Time.now)
+        end
 
         it "retrieves the auction data" do
           subject
@@ -96,10 +116,13 @@ describe Wow::AuctionSyncher do
         end
 
         it "updates the realm last_synced_at" do
-          expect { subject }.to change { realm.last_synced_at.to_i }.to(auctions_last_modified.to_i)
+          expect { subject }.to change {
+            realm.last_synced_at.to_i
+          }.to(auctions_last_modified.to_i)
         end
 
         context "when we have no seen any of the auctions before" do
+
           it "creates new auctions and auction snapshots" do
             expect {
               expect {
@@ -107,13 +130,18 @@ describe Wow::AuctionSyncher do
               }.to change(Wow::Auction, :count).by(3)
             }.to change(Wow::AuctionSnapshot, :count).by(3)
           end
+
+          it "attaches the auction snapshots to the RealmSync" do
+            subject
+            expect(Wow::AuctionSnapshot.last.realm_sync).to eq sync
+          end
         end
 
         context "when we have seen one of the auctions before" do
           let!(:auction) {
             realm.auctions.create!(
-              auction_house: "horde", auc: 1991826120, item: 74248,
-              owner: "Banzi", owner_realm: "Baelgun", buyout: 8750000,
+              auction_house: 'horde', auc: 1991826120, item: 74248,
+              owner: 'Banzi', owner_realm: 'Baelgun', buyout: 8750000,
               quantity: 5, rand: 0, seed: 1208009557
             )
           }
@@ -124,6 +152,11 @@ describe Wow::AuctionSyncher do
 
           it "adds a snapshot to the existing auction" do
             expect { subject }.to change(auction.snapshots, :count).by(1)
+          end
+
+          it "attaches the auction snapshot to the RealmSync" do
+            subject
+            expect(Wow::AuctionSnapshot.last.realm_sync).to eq sync
           end
         end
       end
