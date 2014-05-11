@@ -131,6 +131,14 @@ describe Wow::AuctionSyncher do
             }.to change(Wow::AuctionSnapshot, :count).by(3)
           end
 
+          it "marks the auctions in_progress" do
+            subject
+            sync = realm.realm_syncs.last
+            sync.auction_snapshots.each do |snapshot|
+              expect(snapshot.auction.status).to eq 'in_progress'
+            end
+          end
+
           it "attaches the auction snapshots to the RealmSync" do
             subject
             expect(Wow::AuctionSnapshot.last.realm_sync).to eq sync
@@ -150,6 +158,11 @@ describe Wow::AuctionSyncher do
             expect { subject }.to change(Wow::Auction, :count).by(2)
           end
 
+          it "should leave that auction's state as in_progress" do
+            subject
+            expect(auction.status).to eq 'in_progress'
+          end
+
           it "adds a snapshot to the existing auction" do
             expect { subject }.to change(auction.snapshots, :count).by(1)
           end
@@ -157,6 +170,24 @@ describe Wow::AuctionSyncher do
           it "attaches the auction snapshot to the RealmSync" do
             subject
             expect(Wow::AuctionSnapshot.last.realm_sync).to eq sync
+          end
+        end
+
+        context "if this realm has been synced previously" do
+          let!(:last_sync) { realm.realm_syncs.create! }
+          let!(:old_auc) {
+            realm.auctions.create!(
+              auction_house: 'horde', auc: 1, item: 1,
+              owner: 'Banzi', owner_realm: 'Baelgun', buyout: 1,
+              quantity: 1, rand: 0, seed: 1
+            )
+          }
+          let!(:last_ss_of_old_auc) {
+            create :auction_snapshot, auction: old_auc, realm_sync: last_sync
+          }
+
+          it "should mark auctions that has disappeared as complete" do
+            expect { subject }.to change { old_auc.reload.status }.from('in_progress').to('completed')
           end
         end
       end
