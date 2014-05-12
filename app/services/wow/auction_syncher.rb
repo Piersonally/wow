@@ -94,6 +94,7 @@ module Wow
     concerning :TrackingAuctionsThatHaveDissapeared do
       def find_ids_of_auctions_seen_during_last_sync
         last_sync = @realm.realm_syncs.order(:created_at).last
+        Rails.logger.info "AuctionSyncher: comparing against RealmSync #{last_sync.id}"
         if last_sync
           @missing_auction_ids = Wow::Auction.joins(:snapshots => :realm_sync)
                                    .where("wow_realm_syncs.id = ?", last_sync.id)
@@ -101,13 +102,16 @@ module Wow
         else
           @missing_auction_ids = []
         end
+        Rails.logger.debug "AuctionSyncher: before, #{@missing_auction_ids.size} missing auction IDs #{@missing_auction_ids.inspect}"
       end
 
       def remove_auction_from_missing_list(auction)
-        @missing_auction_ids - [auction.id]
+        Rails.logger.info "AuctionSyncher: removing auction #{auction.id} from list"
+        @missing_auction_ids.delete auction.id
       end
 
       def mark_missing_auctions_as_completed
+        Rails.logger.info "AuctionSyncher: after, #{@missing_auction_ids.size} remaining missing auction IDs to be marked completed #{@missing_auction_ids.inspect}"
         return if @missing_auction_ids.empty?
         Wow::Auction.where(id: @missing_auction_ids)
                     .update_all(status: 'completed')
