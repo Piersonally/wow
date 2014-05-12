@@ -1,0 +1,18 @@
+- title "WoW Auctions"
+
+%br
+.row
+  .col-sm-6.col-sm-offset-1
+    %table.table.table-bordered.table-striped
+      %thead
+        %tr
+      %tbody
+        %tr
+          %td Auctions In Progress
+          %td= Wow::Auction.where(status: 'in_progress').count
+        %tr
+          %td Auctions Completed
+          %td= Wow::Auction.where(status: 'completed').count
+        %tr
+          %td Total Auctions
+          %td= Wow::Auction.count
