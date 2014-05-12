@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    wow (0.0.2)
+    wow (0.0.4)
       foreigner
       haml-rails
       httparty
