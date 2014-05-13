@@ -24,6 +24,8 @@ Gem::Specification.new do |s|
   s.add_dependency "sidekiq"
   s.add_dependency "sidetiq"
   s.add_dependency "httparty"
+  s.add_dependency "kaminari"
+  s.add_dependency "kaminari-bootstrap"
 
   s.add_development_dependency "pg"
   s.add_development_dependency "rspec-rails", ">= 3.0.0.beta2"
