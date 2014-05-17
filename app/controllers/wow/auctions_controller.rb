@@ -3,7 +3,7 @@ class Wow::AuctionsController < ApplicationController
   respond_to :html
 
   def index
-    @auctions = Wow::Auction.includes(:realm).all
+    @auctions = Wow::Auction.includes(:realm).page(params[:page]).per(20)
   end
 
   def show

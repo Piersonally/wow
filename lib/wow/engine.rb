@@ -6,6 +6,8 @@ require 'sidekiq'
 require 'sidekiq/exception_handler'
 require 'sidetiq'
 require 'httparty'
+require 'kaminari'
+require 'kaminari-bootstrap'
 
 module Wow
   class Engine < ::Rails::Engine
