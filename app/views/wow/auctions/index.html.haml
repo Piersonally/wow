@@ -1,9 +1,11 @@
-- title "Listing Auctions"
+- title "Auctions"
+
+= nav auctions_index_tabs_data, class: 'nav-tabs'
+%br
 
 %table.table.table-condensed
   %thead
     %tr
-      %th Status
       %th Auction house
       %th Auc
       %th Item
@@ -15,7 +17,6 @@
   %tbody
     - @auctions.each do |auction|
       %tr
-        %td= auction.status.humanize
         %td
           = auction.realm.name
           = auction.auction_house

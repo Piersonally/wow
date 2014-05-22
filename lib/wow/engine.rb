@@ -8,6 +8,7 @@ require 'sidetiq'
 require 'httparty'
 require 'kaminari'
 require 'kaminari-bootstrap'
+require 'css_class_list'
 
 module Wow
   class Engine < ::Rails::Engine

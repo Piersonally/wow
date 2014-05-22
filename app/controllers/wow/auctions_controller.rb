@@ -6,6 +6,20 @@ class Wow::AuctionsController < ApplicationController
     @auctions = Wow::Auction.includes(:realm).page(params[:page]).per(20)
   end
 
+  def in_progress
+    @auctions = Wow::Auction.includes(:realm)
+                            .where(status: 'in_progress')
+                            .page(params[:page]).per(20)
+    render 'index'
+  end
+
+  def completed
+    @auctions = Wow::Auction.includes(:realm)
+                            .where(status: 'completed')
+                            .page(params[:page]).per(20)
+    render 'index'
+  end
+
   def show
     respond_with @auction
   end
