@@ -15,8 +15,12 @@ module Wow
           href: in_progress_wow_auctions_path
         },
         {
-          name: "Completed",
-          href: completed_wow_auctions_path
+          name: "Sold",
+          href: sold_wow_auctions_path
+        },
+        {
+          name: "Expired",
+          href: expired_wow_auctions_path
         },
         {
           name: "All",

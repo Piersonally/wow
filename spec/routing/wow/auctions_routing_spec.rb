@@ -4,7 +4,8 @@ describe Wow::AuctionsController do
   describe 'routing' do
     it { expect(get    '/wow/auctions'            ).to route_to('wow/auctions#index') }
     it { expect(get    '/wow/auctions/in_progress').to route_to('wow/auctions#in_progress') }
-    it { expect(get    '/wow/auctions/completed'  ).to route_to('wow/auctions#completed') }
+    it { expect(get    '/wow/auctions/sold'       ).to route_to('wow/auctions#sold') }
+    it { expect(get    '/wow/auctions/expired'    ).to route_to('wow/auctions#expired') }
     it { expect(get    '/wow/auctions/new'        ).to route_to('wow/auctions#new') }
     it { expect(get    '/wow/auctions/1'          ).to route_to('wow/auctions#show', :id => '1') }
     it { expect(get    '/wow/auctions/1/edit'     ).to route_to('wow/auctions#edit', :id => '1') }

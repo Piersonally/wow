@@ -5,7 +5,8 @@ Rails.application.routes.draw do
     resources :auctions do
       collection do
         get :in_progress
-        get :completed
+        get :sold
+        get :expired
       end
     end
     resources :realms

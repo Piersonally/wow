@@ -175,19 +175,42 @@ describe Wow::AuctionSyncher do
 
         context "if this realm has been synced previously" do
           let!(:last_sync) { realm.realm_syncs.create! }
-          let!(:old_auc) {
-            realm.auctions.create!(
-              auction_house: 'horde', auc: 1, item: 1,
-              owner: 'Banzi', owner_realm: 'Baelgun', buyout: 1,
-              quantity: 1, rand: 0, seed: 1
-            )
-          }
-          let!(:last_ss_of_old_auc) {
-            create :auction_snapshot, auction: old_auc, realm_sync: last_sync
-          }
 
-          it "should mark auctions that has disappeared as complete" do
-            expect { subject }.to change { old_auc.reload.status }.from('in_progress').to('completed')
+          context "and there is a snapshot of an auction seen on the last sync run" do
+            let!(:old_auc) {
+              realm.auctions.create!(
+                auction_house: 'horde', auc: 1, item: 1,
+                owner: 'Banzi', owner_realm: 'Baelgun', buyout: 1,
+                quantity: 1, rand: 0, seed: 1
+              )
+            }
+            let!(:last_ss_of_old_auc) {
+              create :auction_snapshot, auction: old_auc, realm_sync: last_sync, time_left: time_left
+            }
+
+            context "and that last snapshot had time_left LONG" do
+              let(:time_left) { 'LONG' }
+
+              it "should mark auctions that has disappeared as sold" do
+                expect { subject }.to change { old_auc.reload.status }.from('in_progress').to('sold')
+              end
+            end
+
+            context "and that last snapshot had time_left MEDIUM" do
+              let(:time_left) { 'MEDIUM' }
+
+              it "should mark auctions that has disappeared as expired" do
+                expect { subject }.to change { old_auc.reload.status }.from('in_progress').to('expired')
+              end
+            end
+
+            context "and that last snapshot had time_let SHORT" do
+              let(:time_left) { 'SHORT' }
+
+              it "should mark auctions that has disappeared as expired" do
+                expect { subject }.to change { old_auc.reload.status }.from('in_progress').to('expired')
+              end
+            end
           end
         end
       end

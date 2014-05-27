@@ -13,9 +13,16 @@ class Wow::AuctionsController < ApplicationController
     render 'index'
   end
 
-  def completed
+  def sold
     @auctions = Wow::Auction.includes(:realm)
-                            .where(status: 'completed')
+                            .where(status: 'sold')
+                            .page(params[:page]).per(20)
+    render 'index'
+  end
+
+  def expired
+    @auctions = Wow::Auction.includes(:realm)
+                            .where(status: 'expired')
                             .page(params[:page]).per(20)
     render 'index'
   end
