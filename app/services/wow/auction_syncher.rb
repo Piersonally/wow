@@ -72,7 +72,7 @@ module Wow
       @realm.auctions.create!(
         auction_house: house,
         auc:           auction_data['auc'],
-        item:          auction_data['item'],
+        blizz_item_id: auction_data['item'],
         owner:         auction_data['owner'],
         owner_realm:   auction_data['ownerRealm'],
         buyout:        auction_data['buyout'],

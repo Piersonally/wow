@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140510211921) do
+ActiveRecord::Schema.define(version: 20140528195538) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -31,7 +31,7 @@ ActiveRecord::Schema.define(version: 20140510211921) do
   create_table "wow_auctions", force: true do |t|
     t.integer  "realm_id"
     t.string   "auction_house"
-    t.integer  "item"
+    t.integer  "blizz_item_id"
     t.string   "owner"
     t.string   "owner_realm"
     t.integer  "quantity"
@@ -45,7 +45,7 @@ ActiveRecord::Schema.define(version: 20140510211921) do
   end
 
   add_index "wow_auctions", ["auc"], name: "index_wow_auctions_on_auc", using: :btree
-  add_index "wow_auctions", ["item"], name: "index_wow_auctions_on_item", using: :btree
+  add_index "wow_auctions", ["blizz_item_id"], name: "index_wow_auctions_on_blizz_item_id", using: :btree
   add_index "wow_auctions", ["owner", "owner_realm"], name: "index_wow_auctions_on_owner_and_owner_realm", using: :btree
   add_index "wow_auctions", ["realm_id"], name: "index_wow_auctions_on_realm_id", using: :btree
   add_index "wow_auctions", ["status"], name: "index_wow_auctions_on_status", using: :btree
