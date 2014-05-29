@@ -11,7 +11,7 @@ module Wow
     private
 
     def in_progress_claims_without_items
-      Wow::Auction.where(status: 'in_progress', item_id: nil).limit(5)
+      Wow::Auction.where status: 'in_progress', item_id: nil
     end
   end
 end
