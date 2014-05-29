@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140528214659) do
+ActiveRecord::Schema.define(version: 20140529033158) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -61,7 +61,7 @@ ActiveRecord::Schema.define(version: 20140528214659) do
     t.datetime "updated_at"
   end
 
-  add_index "wow_items", ["blizz_item_id"], name: "index_wow_items_on_blizz_item_id", using: :btree
+  add_index "wow_items", ["blizz_item_id"], name: "index_wow_items_on_blizz_item_id", unique: true, using: :btree
 
   create_table "wow_realm_syncs", force: true do |t|
     t.integer  "realm_id"
@@ -87,6 +87,7 @@ ActiveRecord::Schema.define(version: 20140528214659) do
   add_foreign_key "wow_auction_snapshots", "wow_auctions", name: "wow_auction_snapshots_auction_id_fk", column: "auction_id"
   add_foreign_key "wow_auction_snapshots", "wow_realm_syncs", name: "wow_auction_snapshots_realm_sync_id_fk", column: "realm_sync_id"
 
+  add_foreign_key "wow_auctions", "wow_items", name: "wow_auctions_item_id_fk", column: "item_id"
   add_foreign_key "wow_auctions", "wow_realms", name: "wow_auctions_realm_id_fk", column: "realm_id"
 
   add_foreign_key "wow_realm_syncs", "wow_realms", name: "wow_realm_syncs_realm_id_fk", column: "realm_id"
