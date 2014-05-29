@@ -2,6 +2,7 @@ class Wow::Auction < ActiveRecord::Base
   self.table_name = 'wow_auctions'
 
   belongs_to :realm
+  belongs_to :item, class_name: 'Wow::Item'
   has_many :snapshots, class_name: 'Wow::AuctionSnapshot'
 
   validates :realm_id, :auction_house, presence: true
@@ -13,6 +14,6 @@ class Wow::Auction < ActiveRecord::Base
   end
 
   def item_name
-    blizz_item_id
+    item_id ? item.name : blizz_item_id
   end
 end

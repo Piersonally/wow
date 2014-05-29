@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140528195538) do
+ActiveRecord::Schema.define(version: 20140528214659) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -42,13 +42,26 @@ ActiveRecord::Schema.define(version: 20140528195538) do
     t.integer  "buyout",        limit: 8
     t.integer  "seed",          limit: 8
     t.string   "status",                  default: "in_progress"
+    t.integer  "item_id"
   end
 
   add_index "wow_auctions", ["auc"], name: "index_wow_auctions_on_auc", using: :btree
   add_index "wow_auctions", ["blizz_item_id"], name: "index_wow_auctions_on_blizz_item_id", using: :btree
+  add_index "wow_auctions", ["item_id"], name: "index_wow_auctions_on_item_id", using: :btree
   add_index "wow_auctions", ["owner", "owner_realm"], name: "index_wow_auctions_on_owner_and_owner_realm", using: :btree
   add_index "wow_auctions", ["realm_id"], name: "index_wow_auctions_on_realm_id", using: :btree
   add_index "wow_auctions", ["status"], name: "index_wow_auctions_on_status", using: :btree
+
+  create_table "wow_items", force: true do |t|
+    t.integer  "blizz_item_id"
+    t.string   "name"
+    t.string   "description"
+    t.text     "data"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "wow_items", ["blizz_item_id"], name: "index_wow_items_on_blizz_item_id", using: :btree
 
   create_table "wow_realm_syncs", force: true do |t|
     t.integer  "realm_id"
