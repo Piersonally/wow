@@ -17,9 +17,9 @@ module Wow
     def fetch_item_data
       item_data = api.item @blizz_item_id
 
-      unless @blizz_item_id == item_data['id']
+      unless @blizz_item_id.to_i == item_data['id'].to_i
         raise "Looking up item %d, got item %s: %s" % [
-          @blizz_item_id, item_data['id'], item_data
+          @blizz_item_id.inspect, item_data['id'].inspect, item_data
         ]
       end
       item_data
