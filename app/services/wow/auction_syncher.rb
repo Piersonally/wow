@@ -69,7 +69,8 @@ module Wow
     
     def create_new_auction(house, auction_data)
       @stats[:new_auctions_count] += 1
-      @realm.auctions.create!(
+      item = Wow::Item.find_by_blizz_item_id auction_data['item']
+      auction_attrs = {
         auction_house: house,
         auc:           auction_data['auc'],
         blizz_item_id: auction_data['item'],
@@ -78,8 +79,10 @@ module Wow
         buyout:        auction_data['buyout'],
         quantity:      auction_data['quantity'],
         rand:          auction_data['rand'],
-        seed:          auction_data['seed']
-      )
+        seed:          auction_data['seed'],
+      }
+      auction_attrs[:item_id] = item.id if item
+      @realm.auctions.create! auction_attrs
     end
 
     def create_snapshot_of_auction(auction, auction_data)

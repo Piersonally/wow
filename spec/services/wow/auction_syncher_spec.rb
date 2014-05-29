@@ -143,6 +143,15 @@ describe Wow::AuctionSyncher do
             subject
             expect(Wow::AuctionSnapshot.last.realm_sync).to eq sync
           end
+
+          context "if we have seem one of the auction items before" do
+            let!(:item) { create :item, blizz_item_id: 74248 }
+            let(:created_auction) { Wow::Auction.find_by_auc 1991826120 }
+            it "attaches the auction to the item" do
+              subject
+              expect(created_auction.item).to eq item
+            end
+          end
         end
 
         context "when we have seen one of the auctions before" do
