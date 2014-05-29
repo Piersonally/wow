@@ -1,6 +1,7 @@
 module Wow
   class ItemLookupWorker
     include Sidekiq::Worker
+    sidekiq_options retry: false
 
     def perform
       @items_created_count = 0
