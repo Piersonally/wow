@@ -9,6 +9,8 @@ module Wow
       Wow::Realm.where(polling_enabled: true).each do |realm|
         Wow::AuctionSyncher.new(realm).sync_auctions
       end
+
+      Wow::ItemLookupWorker.perform_in 1.minute
     end
   end
 end
