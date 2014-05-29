@@ -5,6 +5,12 @@ module Wow
     def initialize(realm, options={})
       @realm = realm
       @houses_to_import = options[:auction_houses] || %w[ horde ]
+      @stats = {
+        auctions_created: 0,
+        snapshots_created: 0,
+        auctions_sold: 0,
+        auctions_expired: 0
+      }
     end
 
     def sync_auctions
@@ -12,7 +18,8 @@ module Wow
       @realm.update last_checked_at: Time.now
       auctions_file = Wow::BlizzAuctionsFile.new @realm
       if auctions_file.last_modified_at.to_i == @realm.last_synced_at.to_i
-        Rails.logger.info "AuctionSyncher: skipping #{@realm.name}, auctions file update time is still #{@realm.last_synced_at.to_i}"
+        Rails.logger.info "AuctionSyncher: skipping %s, auctions file update time is still %d" %
+                          [@realm.name, @realm.last_synced_at.to_i]
       else
         retrieve_and_import_auctions auctions_file
       end
@@ -38,15 +45,20 @@ module Wow
 
     def log_end(auctions_file)
       elapsed_time = Time.now - @start_time
-      Rails.logger.info "AuctionSyncher: completed synch of %s %d in %.1fs. %d auctions and %d snapshots created." %
+      Rails.logger.info ("AuctionSyncher: completed synch of %s %d in %.1fs. " +
+                        "Auctions: %d new, %d sold, %d expired, (%d snapshots).") %
         [
-          @realm.name, auctions_file.last_modified_at.to_i, elapsed_time,
-          @stats[:new_auctions_count], @stats[:snapshots_created_count]
+          @realm.name,
+          auctions_file.last_modified_at.to_i,
+          elapsed_time,
+          @stats[:auctions_created],
+          @stats[:auctions_sold],
+          @stats[:auctions_expired],
+          @stats[:snapshots_created]
         ]
     end
 
     def import_auctions(auctions_data)
-      @stats = {new_auctions_count: 0, snapshots_created_count: 0}
       find_ids_of_auctions_seen_during_last_sync
       @sync = @realm.realm_syncs.create!
       @houses_to_import.each do |house|
@@ -68,7 +80,7 @@ module Wow
     end
     
     def create_new_auction(house, auction_data)
-      @stats[:new_auctions_count] += 1
+      @stats[:auctions_created] += 1
       item = Wow::Item.find_by_blizz_item_id auction_data['item']
       auction_attrs = {
         auction_house: house,
@@ -86,7 +98,7 @@ module Wow
     end
 
     def create_snapshot_of_auction(auction, auction_data)
-      @stats[:snapshots_created_count] += 1
+      @stats[:snapshots_created] += 1
       auction.snapshots.create!(
         realm_sync: @sync,
         bid:        auction_data['bid'],
@@ -105,24 +117,23 @@ module Wow
         else
           @missing_auction_ids = []
         end
-        Rails.logger.debug "AuctionSyncher: before, #{@missing_auction_ids.size} missing auction IDs #{@missing_auction_ids.inspect}"
       end
 
       def remove_auction_from_missing_list(auction)
-        Rails.logger.info "AuctionSyncher: removing auction #{auction.id} from list"
         @missing_auction_ids.delete auction.id
       end
 
       def mark_missing_auctions_as_completed
-        Rails.logger.info "AuctionSyncher: after, #{@missing_auction_ids.size} remaining missing auction IDs to be marked completed #{@missing_auction_ids.inspect}"
         return if @missing_auction_ids.empty?
 
         Wow::Auction.where(id: @missing_auction_ids).find_each do |auction|
           last_snapshot = auction.snapshots.last
            if %[SHORT MEDIUM].include? last_snapshot.time_left
              auction.update! status: 'expired'
+             @stats[:auctions_expired] += 1
            else
              auction.update! status: 'sold'
+             @stats[:auctions_sold] += 1
            end
         end
       end
