@@ -5,7 +5,7 @@ FactoryGirl.define do
     realm
     auction_house 'horde'
     auc '12345678'
-    item '12345'
+    blizz_item_id '12345'
     owner 'Sometoon'
     owner_realm 'Somerealm'
     buyout 2500000

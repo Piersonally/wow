@@ -21,6 +21,15 @@ module Wow
         response.parsed_response
       end
 
+      def item(blizz_item_id)
+        uri = "/item/#{blizz_item_id}"
+        response = self.class.get uri, query: { locale: @locale }
+        unless response.ok?
+          raise "Unexpected response #{response.inspect} to GET #{uri}"
+        end
+        response.parsed_response
+      end
+
       private
 
       def api_host

@@ -11,8 +11,11 @@
           %td Auctions In Progress
           %td= Wow::Auction.where(status: 'in_progress').count
         %tr
-          %td Auctions Completed
-          %td= Wow::Auction.where(status: 'completed').count
+          %td Auctions Sold
+          %td= Wow::Auction.where(status: 'sold').count
+        %tr
+          %td Auctions Expired
+          %td= Wow::Auction.where(status: 'expired').count
         %tr
           %td Total Auctions
           %td= Wow::Auction.count

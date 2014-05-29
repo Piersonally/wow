@@ -143,12 +143,21 @@ describe Wow::AuctionSyncher do
             subject
             expect(Wow::AuctionSnapshot.last.realm_sync).to eq sync
           end
+
+          context "if we have seem one of the auction items before" do
+            let!(:item) { create :item, blizz_item_id: 74248 }
+            let(:created_auction) { Wow::Auction.find_by_auc 1991826120 }
+            it "attaches the auction to the item" do
+              subject
+              expect(created_auction.item).to eq item
+            end
+          end
         end
 
         context "when we have seen one of the auctions before" do
           let!(:auction) {
             realm.auctions.create!(
-              auction_house: 'horde', auc: 1991826120, item: 74248,
+              auction_house: 'horde', auc: 1991826120, blizz_item_id: 74248,
               owner: 'Banzi', owner_realm: 'Baelgun', buyout: 8750000,
               quantity: 5, rand: 0, seed: 1208009557
             )
@@ -179,7 +188,7 @@ describe Wow::AuctionSyncher do
           context "and there is a snapshot of an auction seen on the last sync run" do
             let!(:old_auc) {
               realm.auctions.create!(
-                auction_house: 'horde', auc: 1, item: 1,
+                auction_house: 'horde', auc: 1, blizz_item_id: 1,
                 owner: 'Banzi', owner_realm: 'Baelgun', buyout: 1,
                 quantity: 1, rand: 0, seed: 1
               )

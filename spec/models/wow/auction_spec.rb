@@ -10,7 +10,7 @@ describe Wow::Auction do
     it { should validate_presence_of :realm_id }
     it { should validate_presence_of :auction_house }
     it { should validate_presence_of :auc }
-    it { should validate_presence_of :item }
+    it { should validate_presence_of :blizz_item_id }
     it { should validate_presence_of :owner }
     it { should validate_presence_of :owner_realm }
     it { should validate_presence_of :buyout }

@@ -5,9 +5,11 @@ describe Wow::AuctionsController do
   let!(:auction) { create :auction }
 
   let(:valid_auction_params) {
-    { realm_id: realm.to_param, auction_house: 'horde', auc: '1991857830',
-      item: '55714', owner: 'Penloh', owner_realm: 'Baelgun', buyout: '1826700',
-      quantity: '1', rand: '-6', seed: '2094399793' }.with_indifferent_access
+    {
+      realm_id: realm.to_param, auction_house: 'horde', auc: '1991857830',
+      blizz_item_id: '55714', owner: 'Penloh', owner_realm: 'Baelgun',
+      buyout: '1826700', quantity: '1', rand: '-6', seed: '2094399793'
+    }.with_indifferent_access
   }
   let(:invalid_auction_params) {
     { realm_id: nil }.with_indifferent_access

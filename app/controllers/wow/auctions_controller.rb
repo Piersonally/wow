@@ -66,7 +66,7 @@ class Wow::AuctionsController < ApplicationController
 
   def auction_params
     params.require(:auction).permit(
-      :realm_id, :auction_house, :auc, :item, :owner, :owner_realm,
+      :realm_id, :auction_house, :auc, :blizz_item_id, :owner, :owner_realm,
       :buyout, :quantity, :rand, :seed
     )
   end
