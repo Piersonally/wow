@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140529033158) do
+ActiveRecord::Schema.define(version: 20140604151306) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -38,16 +38,18 @@ ActiveRecord::Schema.define(version: 20140529033158) do
     t.integer  "rand"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "auc",           limit: 8
-    t.integer  "buyout",        limit: 8
-    t.integer  "seed",          limit: 8
-    t.string   "status",                  default: "in_progress"
+    t.integer  "auc",              limit: 8
+    t.integer  "buyout",           limit: 8
+    t.integer  "seed",             limit: 8
+    t.string   "status",                     default: "in_progress"
     t.integer  "item_id"
+    t.integer  "last_snapshot_id"
   end
 
   add_index "wow_auctions", ["auc"], name: "index_wow_auctions_on_auc", using: :btree
   add_index "wow_auctions", ["blizz_item_id"], name: "index_wow_auctions_on_blizz_item_id", using: :btree
   add_index "wow_auctions", ["item_id"], name: "index_wow_auctions_on_item_id", using: :btree
+  add_index "wow_auctions", ["last_snapshot_id"], name: "index_wow_auctions_on_last_snapshot_id", using: :btree
   add_index "wow_auctions", ["owner", "owner_realm"], name: "index_wow_auctions_on_owner_and_owner_realm", using: :btree
   add_index "wow_auctions", ["realm_id"], name: "index_wow_auctions_on_realm_id", using: :btree
   add_index "wow_auctions", ["status"], name: "index_wow_auctions_on_status", using: :btree
@@ -87,6 +89,7 @@ ActiveRecord::Schema.define(version: 20140529033158) do
   add_foreign_key "wow_auction_snapshots", "wow_auctions", name: "wow_auction_snapshots_auction_id_fk", column: "auction_id"
   add_foreign_key "wow_auction_snapshots", "wow_realm_syncs", name: "wow_auction_snapshots_realm_sync_id_fk", column: "realm_sync_id"
 
+  add_foreign_key "wow_auctions", "wow_auction_snapshots", name: "wow_auctions_last_snapshot_id_fk", column: "last_snapshot_id"
   add_foreign_key "wow_auctions", "wow_items", name: "wow_auctions_item_id_fk", column: "item_id"
   add_foreign_key "wow_auctions", "wow_realms", name: "wow_auctions_realm_id_fk", column: "realm_id"
 

@@ -3,27 +3,21 @@ class Wow::AuctionsController < ApplicationController
   respond_to :html
 
   def index
-    @auctions = Wow::Auction.includes(:realm).page(params[:page]).per(20)
+    @auctions = auctions
   end
 
   def in_progress
-    @auctions = Wow::Auction.includes(:realm)
-                            .where(status: 'in_progress')
-                            .page(params[:page]).per(20)
+    @auctions = auctions.where(status: 'in_progress')
     render 'index'
   end
 
   def sold
-    @auctions = Wow::Auction.includes(:realm)
-                            .where(status: 'sold')
-                            .page(params[:page]).per(20)
+    @auctions = auctions.where(status: 'sold')
     render 'index'
   end
 
   def expired
-    @auctions = Wow::Auction.includes(:realm)
-                            .where(status: 'expired')
-                            .page(params[:page]).per(20)
+    @auctions = auctions.where(status: 'expired')
     render 'index'
   end
 
@@ -69,5 +63,9 @@ class Wow::AuctionsController < ApplicationController
       :realm_id, :auction_house, :auc, :blizz_item_id, :owner, :owner_realm,
       :buyout, :quantity, :rand, :seed
     )
+  end
+
+  def auctions
+    Wow::Auction.includes(:realm, :item, :last_snapshot).page(params[:page]).per(20)
   end
 end

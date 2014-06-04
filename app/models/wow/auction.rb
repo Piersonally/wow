@@ -4,6 +4,7 @@ class Wow::Auction < ActiveRecord::Base
   belongs_to :realm
   belongs_to :item, class_name: 'Wow::Item'
   has_many :snapshots, class_name: 'Wow::AuctionSnapshot'
+  belongs_to :last_snapshot, class_name: 'Wow::AuctionSnapshot'
 
   validates :realm_id, :auction_house, presence: true
   validates :auc, :blizz_item_id, :owner, :owner_realm, :buyout, :quantity,
