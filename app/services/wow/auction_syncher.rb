@@ -99,11 +99,12 @@ module Wow
 
     def create_snapshot_of_auction(auction, auction_data)
       @stats[:snapshots_created] += 1
-      auction.snapshots.create!(
+      snapshot = auction.snapshots.create!(
         realm_sync: @sync,
         bid:        auction_data['bid'],
         time_left:  auction_data['timeLeft']
       )
+      auction.update! last_snapshot: snapshot
     end
 
     concerning :TrackingAuctionsThatHaveDissapeared do

@@ -131,6 +131,13 @@ describe Wow::AuctionSyncher do
             }.to change(Wow::AuctionSnapshot, :count).by(3)
           end
 
+          it "sets that auction's last_snapshot" do
+            subject
+            expect(Wow::Auction.find_by_auc(1991826120).last_snapshot_id).not_to be_blank
+            expect(Wow::Auction.find_by_auc(1991857830).last_snapshot_id).not_to be_blank
+            expect(Wow::Auction.find_by_auc(1991734081).last_snapshot_id).not_to be_blank
+          end
+
           it "marks the auctions in_progress" do
             subject
             sync = realm.realm_syncs.last
