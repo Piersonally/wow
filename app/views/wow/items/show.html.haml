@@ -1,0 +1,46 @@
+- title @item.name
+
+- content_for :javascripts do
+  <script type="text/javascript" src="https://static.wowhead.com/widgets/power.js"></script>
+  %script
+    var wowhead_tooltips = { "colorlinks": true, "iconizelinks": true, "renamelinks": true }
+
+%p
+  = link_to @item.name, '#', rel: "item=#{@item.blizz_item_id}"
+
+- if @item.data['description']
+  %p
+    = @item.data['description']
+
+- if @item.data['itemSpells'].any?
+  %p
+    = @item.data['itemSpells'].first['spell']['description']
+
+- modal_id = "itemDataModal#{@item.id}"
+
+= link_to "Raw Data", '#', class: 'btn btn-xs btn-info',
+                           data:{ toggle: 'modal', target: "##{modal_id}" }
+
+= render 'modal', id: modal_id, title: "Raw Data",
+                  body: pretty_print_data(@item.data).html_safe
+
+%h2 Auctions
+
+- auctions = @item.auctions.group_by { |a| a.status }
+
+<!-- Nav tabs -->
+%ul.nav.nav-tabs
+  %li.active= link_to "In Progress", '#in_progress', data: {toggle: 'tab'}
+  %li= link_to "Sold", '#sold', data: {toggle: 'tab'}
+  %li= link_to "Expired", '#expired', data: {toggle: 'tab'}
+
+<!-- Tab panes -->
+.tab-content
+  #in_progress.tab-pane.active
+    = render 'auctions', auctions: auctions['in_progress']
+
+  #sold.tab-pane
+    = render 'auctions', auctions: auctions['sold']
+
+  #expired.tab-pane
+    = render 'auctions', auctions: auctions['expired']

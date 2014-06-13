@@ -1,0 +1,22 @@
+- if auctions.blank?
+  %p
+    No auctions.
+- else
+  %table.table.table-condendsed
+    %thead
+      %tr
+        %th As of
+        %th Quantity
+        %th Buyout
+        %th Owner
+        %th Time Left
+    %tbody
+      - auctions.each do |auction|
+        %tr
+          %td
+            = time_ago_in_words auction.last_snapshot.created_at
+            ago
+          %td= auction.quantity
+          %td= wow_price auction.buyout
+          %td= auction.owner_name
+          %td= auction.last_snapshot.time_left

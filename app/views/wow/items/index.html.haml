@@ -1,0 +1,27 @@
+- title "Items"
+
+- content_for :javascripts do
+  <script type="text/javascript" src="https://static.wowhead.com/widgets/power.js"></script>
+  %script
+    var wowhead_tooltips = { "colorlinks": true, "iconizelinks": true, "renamelinks": true }
+
+%br
+%p= page_entries_info @items
+
+%table.table.table-condensed
+  %thead
+    %tr
+      %th Name
+      %th Auctions (In Progress)
+      %th Auctions (Sold)
+      %th Auctions (Expired)
+
+  %tbody
+    - @items.each do |item|
+      %tr
+        %td= link_to item.name, item, rel: "item=#{item.blizz_item_id}"
+        %td= item.auctions.select { |a| a.status == 'in_progress' }.size
+        %td= item.auctions.select { |a| a.status == 'sold' }.size
+        %td= item.auctions.select { |a| a.status == 'expired' }.size
+
+= paginate @items

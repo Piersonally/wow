@@ -16,16 +16,18 @@ Gem::Specification.new do |s|
 
   s.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.rdoc"]
 
-  s.add_dependency "rails", "~> 4.1.0"
-  s.add_dependency "haml-rails"
-  s.add_dependency "meta-tags"
-  s.add_dependency "simple_form", "3.1.0.rc1"
-  s.add_dependency "foreigner"
-  s.add_dependency "sidekiq"
-  s.add_dependency "sidetiq"
-  s.add_dependency "httparty"
-  s.add_dependency "kaminari"
-  s.add_dependency "kaminari-bootstrap"
+  s.add_dependency 'rails', '~> 4.1.0'
+  s.add_dependency 'haml-rails'
+  s.add_dependency 'meta-tags'
+  s.add_dependency 'simple_form', '3.1.0.rc1'
+  s.add_dependency 'foreigner'
+  s.add_dependency 'sidekiq'
+  s.add_dependency 'sidetiq'
+  s.add_dependency 'httparty'
+  s.add_dependency 'kaminari'
+  s.add_dependency 'kaminari-bootstrap'
+  s.add_dependency 'coderay'                   # Code pretty printer
+
 
   s.add_development_dependency "pg"
   s.add_development_dependency "rspec-rails", ">= 3.0.0.beta2"

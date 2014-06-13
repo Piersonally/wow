@@ -1,0 +1,16 @@
+-# Required Parameters:
+-#   id
+-#   title
+-#   body
+
+.modal.fade{ id: id, tabindex: '-1', role: 'dialog', 'aria-labelledby' => 'myModalLabel', 'aria-hidden' => true }
+  .modal-dialog
+    .modal-content
+      .modal-header
+        %button.close{ type:'button', data:{dismiss:'modal', 'aria-hidden' => 'true' } } &times;
+        %h4#myModalLabel.modal-title= title
+      .modal-body
+        ~ body
+      .modal-footer
+        = link_to "Close", '', type: 'button', class: 'btn btn-default',
+                               autofocus: true, data:{dismiss:'modal'}

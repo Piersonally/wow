@@ -31,5 +31,14 @@ module Wow
         }
       ]
     end
+
+    def pretty_print_data(data)
+      data = JSON.parse(data) if data.is_a?(String) && is_json?(data)
+      if data.is_a? Hash
+        CodeRay.scan(JSON.pretty_generate(data), :json).div
+      else
+        data
+      end
+    end
   end
 end
