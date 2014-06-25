@@ -7,5 +7,13 @@ module Wow
     store :data, coder: JSON
 
     validates :blizz_item_id, :name, presence: true
+
+    searchkick index_name: "#{Rails.application.class.parent_name.downcase}_#{model_name.plural}_#{Rails.env.to_s}"
+
+    def search_data
+      {
+        name: name
+      }
+    end
   end
 end

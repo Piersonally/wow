@@ -10,6 +10,10 @@ Rails.application.routes.draw do
       end
     end
     resources :realms
-    resources :items, only: [:index, :show]
+    resources :items, only: [:index, :show] do
+      collection do
+        get :search
+      end
+    end
   end
 end

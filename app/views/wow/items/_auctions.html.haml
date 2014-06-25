@@ -14,9 +14,9 @@
       - auctions.each do |auction|
         %tr
           %td
-            = time_ago_in_words auction.last_snapshot.created_at
+            = time_ago_in_words auction.snapshots.last.created_at
             ago
           %td= auction.quantity
           %td= wow_price auction.buyout
           %td= auction.owner_name
-          %td= auction.last_snapshot.time_left
+          %td= auction.snapshots.last.time_left

@@ -30,9 +30,9 @@
 
 <!-- Nav tabs -->
 %ul.nav.nav-tabs
-  %li.active= link_to "In Progress", '#in_progress', data: {toggle: 'tab'}
-  %li= link_to "Sold", '#sold', data: {toggle: 'tab'}
-  %li= link_to "Expired", '#expired', data: {toggle: 'tab'}
+  %li.active= link_with_count "In Progress", '#in_progress', auctions['in_progress'], data: {toggle: 'tab'}
+  %li=        link_with_count "Sold",        '#sold',        auctions['sold'], data: {toggle: 'tab'}
+  %li=        link_with_count "Expired",     '#expired',     auctions['expired'], data: {toggle: 'tab'}
 
 <!-- Tab panes -->
 .tab-content

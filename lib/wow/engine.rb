@@ -9,6 +9,7 @@ require 'httparty'
 require 'kaminari'
 require 'kaminari-bootstrap'
 require 'coderay'
+require 'searchkick'
 require 'css_class_list'
 
 module Wow

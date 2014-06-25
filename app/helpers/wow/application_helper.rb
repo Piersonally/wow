@@ -40,5 +40,11 @@ module Wow
         data
       end
     end
+
+    def link_with_count(link_text, href, items, link_options={})
+      count = items ? items.count : nil
+      count_text = count && count > 0 ? " (#{count})" : ""
+      link_to "#{link_text}#{count_text}", href, link_options
+    end
   end
 end

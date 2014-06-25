@@ -27,7 +27,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'kaminari'
   s.add_dependency 'kaminari-bootstrap'
   s.add_dependency 'coderay'                   # Code pretty printer
-
+  s.add_dependency 'searchkick'
 
   s.add_development_dependency "pg"
   s.add_development_dependency "rspec-rails", ">= 3.0.0.beta2"

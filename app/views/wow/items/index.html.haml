@@ -5,8 +5,11 @@
   %script
     var wowhead_tooltips = { "colorlinks": true, "iconizelinks": true, "renamelinks": true }
 
-%br
-%p= page_entries_info @items
+= simple_form_for :search, url: search_wow_items_path, method: :get do |f|
+  = f.input :q, input_html: { value: params[:search].try(:fetch, :q, nil) },
+                placeholder: "Enter Search", label: false, autofocus: true
+
+%p= page_entries_info @items, entry_name: 'Item'
 
 %table.table.table-condensed
   %thead
