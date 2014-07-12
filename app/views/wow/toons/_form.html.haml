@@ -1,0 +1,10 @@
+= simple_form_for @toon, as: :toon, html: { class: "form-horizontal" },
+                                    wrapper: :horizontal_form do |f|
+  = f.error_notification
+
+  .form-inputs
+    = f.input :realm_id, collection: Wow::Realm.all
+    = f.input :name
+
+  .form-actions
+    = f.button :submit, class: "btn btn-primary"

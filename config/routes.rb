@@ -9,11 +9,12 @@ Rails.application.routes.draw do
         get :expired
       end
     end
-    resources :realms
     resources :items, only: [:index, :show] do
       collection do
         get :search
       end
     end
+    resources :realms
+    resources :toons
   end
 end

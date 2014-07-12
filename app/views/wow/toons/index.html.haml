@@ -1,0 +1,23 @@
+- title "Your Toons"
+
+%table.table.table-condensed
+  %thead
+    %tr
+      %th Realm
+      %th Name
+      %th
+
+  %tbody
+    - @toons.each do |toon|
+      %tr
+        %td= link_to toon.realm.name, toon.realm
+        %td= link_to toon.name, toon
+        %td
+          = link_to "Edit", edit_wow_toon_path(toon), class: "btn btn-xs btn-info"
+          = link_to "Destroy", toon, :method => :delete,
+                               :data => { :confirm => "Are you sure?" },
+                               class: "btn btn-xs btn-danger"
+
+%br
+
+= link_to "New Toon", new_wow_toon_path, class: "btn btn-primary"

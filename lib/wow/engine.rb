@@ -19,3 +19,4 @@ module Wow
 end
 
 require 'wow/battle_net/api_client'
+require 'wow/user_extensions'

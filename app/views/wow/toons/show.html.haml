@@ -1,0 +1,12 @@
+- title "Toon #{@toon.full_name}"
+%p
+  %b Realm:
+  = @toon.realm.name
+%p
+  %b Name:
+  = @toon.name
+
+%br
+= link_to 'Edit', edit_wow_toon_path(@toon), class: 'btn btn-info'
+%br
+= link_to 'Back', wow_toons_path
