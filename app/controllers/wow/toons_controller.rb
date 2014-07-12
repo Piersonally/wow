@@ -4,11 +4,12 @@ module Wow
     before_action :load_toon, only: [:show, :edit, :update, :destroy]
 
     def index
-      @toons = current_user.toons
+      @toons = current_user.toons.order(:name)
       respond_with @toons
     end
 
     def show
+      @auctions = auctions
       respond_with @toon
     end
 
@@ -48,6 +49,19 @@ module Wow
 
     def toon_params
       params.require(:toon).permit :realm_id, :name
+    end
+
+    def auctions
+      auctions = Wow::Auction.where(owner_realm: @toon.realm.name,
+                                    owner: @toon.name)
+                             .includes(:realm, :item, :last_snapshot)
+                             .page(params[:page]).per(10)
+      auctions = auctions.where(status: auctions_status) if auctions_status && auctions_status != 'all'
+      auctions
+    end
+
+    def auctions_status
+      @auctions_status ||= params[:auctions] || 'in_progress'
     end
   end
 end

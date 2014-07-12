@@ -10,3 +10,11 @@
 = link_to 'Edit', edit_wow_toon_path(@toon), class: 'btn btn-info'
 %br
 = link_to 'Back', wow_toons_path
+
+%h2 Auctions
+
+= nav toon_auctions_tabs_data, class: 'nav-tabs'
+
+%br
+= render 'wow/auctions/auctions', auctions: @auctions
+

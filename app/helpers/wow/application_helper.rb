@@ -32,6 +32,16 @@ module Wow
       ]
     end
 
+    def toon_auctions_tabs_data
+      %w[in_progress sold expired all].map do |auctions_status|
+        {
+          name: auctions_status.titleize,
+          href: wow_toon_path(id: @toon.id, auctions: auctions_status),
+          active: -> { @auctions_status == auctions_status }
+        }
+      end
+    end
+
     def pretty_print_data(data)
       data = JSON.parse(data) if data.is_a?(String) && is_json?(data)
       if data.is_a? Hash

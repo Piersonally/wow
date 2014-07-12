@@ -36,8 +36,12 @@ module Wow
     end
 
     def item_is_active?(item_data)
-      if item_data[:active] && item_data[:active].is_a?(Regexp)
-        request.path =~ item_data[:active]
+      if item_data[:active]
+        if item_data[:active].is_a?(Regexp)
+          request.path =~ item_data[:active]
+        elsif item_data[:active].is_a?(Proc)
+          item_data[:active].call
+        end
       else
         request.path == item_data[:href]
       end

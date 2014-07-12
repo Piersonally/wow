@@ -10,8 +10,8 @@
   %tbody
     - @toons.each do |toon|
       %tr
-        %td= link_to toon.realm.name, toon.realm
         %td= link_to toon.name, toon
+        %td= link_to toon.realm.name, toon.realm
         %td
           = link_to "Edit", edit_wow_toon_path(toon), class: "btn btn-xs btn-info"
           = link_to "Destroy", toon, :method => :delete,

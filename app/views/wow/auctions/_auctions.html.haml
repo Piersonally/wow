@@ -1,0 +1,30 @@
+- content_for :javascripts do
+  <script type="text/javascript" src="https://static.wowhead.com/widgets/power.js"></script>
+  %script
+    var wowhead_tooltips = { "colorlinks": true, "iconizelinks": true, "renamelinks": true }
+
+%p= page_entries_info auctions
+
+%table.table.table-condensed
+  %thead
+    %tr
+      %th As of
+      %th Item
+      %th Quantity
+      %th Buyout
+      %th Owner
+      %th Time Left
+
+  %tbody
+    - auctions.each do |auction|
+      %tr
+        %td
+          = time_ago_in_words auction.last_snapshot.created_at
+          ago
+        %td= link_to auction.item_name, auction, rel: "item=#{auction.blizz_item_id}"
+        %td= auction.quantity
+        %td= wow_price auction.buyout
+        %td= auction.owner_name
+        %td= auction.last_snapshot.time_left
+
+= paginate auctions
