@@ -1,5 +1,5 @@
 module Wow
-  class ItemsController < ApplicationController
+  class ItemsController < BaseController
     def index
       @items = Wow::Item.includes(:auctions)
                         .page(params[:page]).per(15)

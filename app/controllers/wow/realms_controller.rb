@@ -1,5 +1,5 @@
 module Wow
-  class RealmsController < ApplicationController
+  class RealmsController < BaseController
     respond_to :html
     before_action :load_realm, only: [:show, :edit, :update, :destroy]
 
