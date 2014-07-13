@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140712144909) do
+ActiveRecord::Schema.define(version: 20140713223737) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -72,6 +72,18 @@ ActiveRecord::Schema.define(version: 20140712144909) do
   add_index "wow_auctions", ["realm_id"], name: "index_wow_auctions_on_realm_id", using: :btree
   add_index "wow_auctions", ["status"], name: "index_wow_auctions_on_status", using: :btree
 
+  create_table "wow_bolos", force: true do |t|
+    t.integer  "watcher_id"
+    t.integer  "item_id"
+    t.integer  "found_auction_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "wow_bolos", ["found_auction_id"], name: "index_wow_bolos_on_found_auction_id", using: :btree
+  add_index "wow_bolos", ["item_id"], name: "index_wow_bolos_on_item_id", using: :btree
+  add_index "wow_bolos", ["watcher_id"], name: "index_wow_bolos_on_watcher_id", using: :btree
+
   create_table "wow_items", force: true do |t|
     t.integer  "blizz_item_id"
     t.string   "name"
@@ -121,6 +133,10 @@ ActiveRecord::Schema.define(version: 20140712144909) do
   add_foreign_key "wow_auctions", "wow_auction_snapshots", name: "wow_auctions_last_snapshot_id_fk", column: "last_snapshot_id"
   add_foreign_key "wow_auctions", "wow_items", name: "wow_auctions_item_id_fk", column: "item_id"
   add_foreign_key "wow_auctions", "wow_realms", name: "wow_auctions_realm_id_fk", column: "realm_id"
+
+  add_foreign_key "wow_bolos", "users", name: "wow_bolos_watcher_id_fk", column: "watcher_id"
+  add_foreign_key "wow_bolos", "wow_auctions", name: "wow_bolos_found_auction_id_fk", column: "found_auction_id"
+  add_foreign_key "wow_bolos", "wow_items", name: "wow_bolos_item_id_fk", column: "item_id"
 
   add_foreign_key "wow_realm_syncs", "wow_realms", name: "wow_realm_syncs_realm_id_fk", column: "realm_id"
 
