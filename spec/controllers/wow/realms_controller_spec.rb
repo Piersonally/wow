@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Wow::RealmsController do
+describe Wow::RealmsController, type: :controller do
   let!(:realm) { create :realm }
 
   let(:valid_realm_params) {

@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Wow::AuctionsController do
+describe Wow::AuctionsController, type: :controller do
   let!(:realm) { create :realm }
   let!(:auction) { create :auction }
 

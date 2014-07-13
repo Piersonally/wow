@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Wow::ToonsController do
+describe Wow::ToonsController, type: :controller do
   let(:realm) { create :realm }
   let(:user) { create :user }
   let!(:toon) { create :toon, user: user }

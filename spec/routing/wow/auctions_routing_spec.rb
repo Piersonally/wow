@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Wow::AuctionsController do
+describe Wow::AuctionsController, type: :routing do
   describe 'routing' do
     it { expect(get    '/wow/auctions'            ).to route_to('wow/auctions#index') }
     it { expect(get    '/wow/auctions/in_progress').to route_to('wow/auctions#in_progress') }

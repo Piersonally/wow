@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Wow::ToonsController do
+describe Wow::ToonsController, type: :routing do
   describe 'routing' do
     it { expect(get    '/wow/toons'            ).to route_to('wow/toons#index') }
     it { expect(get    '/wow/toons/new'        ).to route_to('wow/toons#new') }
