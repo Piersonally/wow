@@ -1,5 +1,5 @@
 module Wow
-  module ApplicationHelper
+  module WowHelper
 
     def wow_price(price)
       copper = price % 100
@@ -13,22 +13,10 @@ module Wow
 
     def auctions_index_tabs_data
       [
-        {
-          name: "In Progress",
-          href: in_progress_wow_auctions_path
-        },
-        {
-          name: "Sold",
-          href: sold_wow_auctions_path
-        },
-        {
-          name: "Expired",
-          href: expired_wow_auctions_path
-        },
-        {
-          name: "All",
-          href: wow_auctions_path
-        }
+        { name: "In Progress", href: in_progress_wow_auctions_path },
+        { name: "Sold",        href: sold_wow_auctions_path },
+        { name: "Expired",     href: expired_wow_auctions_path },
+        { name: "All",         href: wow_auctions_path }
       ]
     end
 
@@ -55,6 +43,11 @@ module Wow
       count = items ? items.count : nil
       count_text = count && count > 0 ? " (#{count})" : ""
       link_to "#{link_text}#{count_text}", href, link_options
+    end
+
+    def time_ago_with_tooltip(datetime)
+      content_tag :span, "#{time_ago_in_words datetime} ago",
+                  data: { toggle: 'tooltip', placement: 'right', title: datetime.to_s }
     end
   end
 end

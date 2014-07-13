@@ -9,12 +9,10 @@
   = link_to @item.name, '#', rel: "item=#{@item.blizz_item_id}"
 
 - if @item.data['description']
-  %p
-    = @item.data['description']
+  %p= @item.data['description']
 
 - if @item.data['itemSpells'].any?
-  %p
-    = @item.data['itemSpells'].first['spell']['description']
+  %p= @item.data['itemSpells'].first['spell']['description']
 
 - modal_id = "itemDataModal#{@item.id}"
 
@@ -26,13 +24,13 @@
 
 %h2 Auctions
 
-- auctions = @item.auctions.group_by { |a| a.status }
+- auctions = @item.auctions.order(created_at: :desc).group_by { |a| a.status }
 
 <!-- Nav tabs -->
 %ul.nav.nav-tabs
   %li.active= link_with_count "In Progress", '#in_progress', auctions['in_progress'], data: {toggle: 'tab'}
-  %li=        link_with_count "Sold",        '#sold',        auctions['sold'], data: {toggle: 'tab'}
-  %li=        link_with_count "Expired",     '#expired',     auctions['expired'], data: {toggle: 'tab'}
+  %li=        link_with_count "Sold",        '#sold',        auctions['sold'],        data: {toggle: 'tab'}
+  %li=        link_with_count "Expired",     '#expired',     auctions['expired'],     data: {toggle: 'tab'}
 
 <!-- Tab panes -->
 .tab-content

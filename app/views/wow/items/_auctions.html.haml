@@ -10,13 +10,14 @@
         %th Buyout
         %th Owner
         %th Time Left
+        %th
     %tbody
       - auctions.each do |auction|
         %tr
           %td
-            = time_ago_in_words auction.snapshots.last.created_at
-            ago
+            = time_ago_with_tooltip auction.snapshots.last.created_at
           %td= auction.quantity
           %td= wow_price auction.buyout
           %td= auction.owner_name
           %td= auction.snapshots.last.time_left
+          %td= link_to 'Show', wow_auction_path(auction), class: 'btn btn-xs btn-success'

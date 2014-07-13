@@ -18,9 +18,7 @@
   %tbody
     - auctions.each do |auction|
       %tr
-        %td
-          = time_ago_in_words auction.last_snapshot.created_at
-          ago
+        %td= time_ago_with_tooltip auction.last_snapshot.created_at
         %td= link_to auction.item_name, auction, rel: "item=#{auction.blizz_item_id}"
         %td= auction.quantity
         %td= wow_price auction.buyout
