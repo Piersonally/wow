@@ -1,0 +1,25 @@
+- title "Your Auction Alerts"
+
+%table.table.table-condensed
+  %thead
+    %tr
+      %th Item
+      %th Found Auction
+      %th
+
+  %tbody
+    - @bolos.each do |bolo|
+      %tr
+        %td= link_to bolo.item.name, bolo
+        %td
+          - if bolo.found_auction
+            = link_to bolo.found_auction.item.name, bolo.found_auction
+        %td
+          = link_to "Edit", edit_wow_bolo_path(bolo), class: "btn btn-xs btn-info"
+          = link_to "Destroy", bolo, :method => :delete,
+                               :data => { :confirm => "Are you sure?" },
+                               class: "btn btn-xs btn-danger"
+
+%br
+
+= link_to "New Alert", new_wow_bolo_path, class: "btn btn-primary"

@@ -9,6 +9,7 @@ Rails.application.routes.draw do
         get :expired
       end
     end
+    resources :bolos
     resources :items, only: [:index, :show] do
       collection do
         get :search

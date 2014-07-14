@@ -1,0 +1,12 @@
+- title "Auction Alert for #{@bolo.item.name}"
+%p
+  %b Item:
+  = @bolo.item.name
+%p
+  %b Found Auction:
+  = @bolo.found_auction
+
+%br
+= link_to 'Edit', edit_wow_bolo_path(@bolo), class: 'btn btn-info'
+%br
+= link_to 'Back', wow_bolos_path
