@@ -10,8 +10,13 @@ module Wow
     end
 
     def retrieve_auction_data
-      json_string = Net::HTTP.get URI(file_location)
-      JSON.parse json_string
+      response = Net::HTTP.get URI(file_location)
+      begin
+        JSON.parse response
+      rescue JSON::ParserError
+        Rails.logger.error "Wow::BlizzAuctionsFile response = #{response.inspect}"
+        raise
+      end
     end
 
     private
