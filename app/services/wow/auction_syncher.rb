@@ -5,6 +5,7 @@ module Wow
     def initialize(realm, options={})
       @realm = realm
       @houses_to_import = options[:auction_houses] || %w[ horde ]
+      @auctions_file = Wow::BlizzAuctionsFile.new @realm
       @stats = {
         auctions_created: 0,
         snapshots_created: 0,
@@ -14,48 +15,60 @@ module Wow
     end
 
     def sync_auctions
+      log "starting"
       raise "realm is not enabled" unless @realm.polling_enabled?
+
       @realm.update last_checked_at: Time.now
-      auctions_file = Wow::BlizzAuctionsFile.new @realm
-      if auctions_file.last_modified_at.to_i == @realm.last_synced_at.to_i
-        Rails.logger.info "AuctionSyncher: skipping %s, auctions file update time is still %d" %
-                          [@realm.name, @realm.last_synced_at.to_i]
+      if @auctions_file.last_modified_at.to_i == @realm.last_synced_at.to_i
+        message = "skipping %s, auctions file update time is still %d" %
+          [@realm.name, @realm.last_synced_at.to_i]
+        log message, publish: true
       else
-        retrieve_and_import_auctions auctions_file
+        log_start
+        retrieve_and_import_auctions
+        log_end
       end
     end
 
     private
 
-    def retrieve_and_import_auctions(auctions_file)
-      log_start auctions_file
-      auctions_data = auctions_file.retrieve_auction_data
+    include Logging
+
+    EVENT_CODE = 'com.piersonally.wow.AuctionSyncher'
+
+    def log_with_less_args(message, options={})
+      log_without_less_args EVENT_CODE, message, options
+    end
+    alias_method_chain :log, :less_args
+
+    def retrieve_and_import_auctions
+      auctions_data = @auctions_file.retrieve_auction_data
       Wow::Auction.transaction do
         import_auctions auctions_data
-        @realm.update last_synced_at: auctions_file.last_modified_at
+        @realm.update last_synced_at: @auctions_file.last_modified_at
       end
-      log_end auctions_file
     end
 
-    def log_start(auctions_file)
+    def log_start
       @start_time = Time.now
-      Rails.logger.info "AuctionSyncher: starting synch of %s %d at %s" %
-                          [@realm.name, auctions_file.last_modified_at.to_i, @start_time]
+      log "Synching %s %d at %s" %
+        [@realm.name, @auctions_file.last_modified_at.to_i, @start_time]
     end
 
-    def log_end(auctions_file)
+    def log_end
       elapsed_time = Time.now - @start_time
-      Rails.logger.info ("AuctionSyncher: completed synch of %s %d in %.1fs. " +
-                        "Auctions: %d new, %d sold, %d expired, (%d snapshots).") %
+      message = ("Synched %s %d in %.1fs. " +
+          "Auctions: %d new, %d sold, %d expired, (%d snapshots).") %
         [
           @realm.name,
-          auctions_file.last_modified_at.to_i,
+          @auctions_file.last_modified_at.to_i,
           elapsed_time,
           @stats[:auctions_created],
           @stats[:auctions_sold],
           @stats[:auctions_expired],
           @stats[:snapshots_created]
         ]
+      log message, publish: true
     end
 
     def import_auctions(auctions_data)
@@ -107,7 +120,8 @@ module Wow
       auction.update! last_snapshot: snapshot
     end
 
-    concerning :TrackingAuctionsThatHaveDissapeared do
+    concerning :TrackingAuctionsThatHaveDisappeared do
+
       def find_ids_of_auctions_seen_during_last_sync
         last_sync = @realm.realm_syncs.order(:created_at).last
         if last_sync
