@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    wow (0.2.1)
+    wow (0.2.2)
       coderay
       foreigner
       haml-rails
