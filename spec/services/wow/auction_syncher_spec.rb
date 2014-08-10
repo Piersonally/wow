@@ -6,11 +6,14 @@ describe Wow::AuctionSyncher do
     let(:syncher) { Wow::AuctionSyncher.new realm }
     subject { syncher.sync_auctions }
 
+    let(:auctions_data_file_url) {
+      'http://us.battle.net/auction-data/e44ae1e38fefbe8d879d6af846d0014f/auctions.json'
+    }
     let(:auction_datafile_location_response) {
       {
         'files' => [
           {
-            'url' => 'http://us.battle.net/auction-data/e44ae1e38fefbe8d879d6af846d0014f/auctions.json',
+            'url' => auctions_data_file_url,
             'lastModified' => auctions_last_modified.to_i * 1000
           }
         ]
@@ -24,17 +27,6 @@ describe Wow::AuctionSyncher do
         to_return(:status => 200,
                   :body => auction_datafile_location_response,
                   :headers => {'Content-Type' => 'application/json'})
-    end
-
-    let(:auction_data_response) {
-      IO.read fixture_file_path 'auction_data_baelgun.json'
-    }
-
-    let!(:auction_data_request) do
-      stub_request(:get, 'http://us.battle.net/auction-data/e44ae1e38fefbe8d879d6af846d0014f/auctions.json').
-        to_return(:status => 200,
-                  :body => auction_data_response,
-                  :headers => { 'Content-Type' => 'application/json'})
     end
 
     context "for a disabled realm" do
@@ -57,7 +49,9 @@ describe Wow::AuctionSyncher do
     end
 
     context "for an enabled Realm" do
-      let!(:realm) { create :enabled_realm, slug: 'baelgun' }
+      let!(:realm) { create :enabled_realm, slug: 'baelgun',
+                            last_synced_at: auctions_last_modified
+      }
 
       it "updates the realm's last_checked_at" do
         realm.update last_checked_at: 1.hour.ago
@@ -65,169 +59,200 @@ describe Wow::AuctionSyncher do
         expect(realm.last_checked_at).to be_within(5.seconds).of(Time.now)
       end
 
-      it "locates the auction data for the realm" do
-        subject
-        expect(auction_datafile_location_request).to have_been_made.once
-      end
+      context "and the auctions file exists" do
+        let(:auction_data_response) {
+          IO.read fixture_file_path 'auction_data_baelgun.json'
+        }
 
-      context "if the auction data lastModifed is the same
-                                              as the realm last-synced_at"  do
-        before { realm.update last_synced_at: auctions_last_modified }
-
-        it "doesn't create a RealmSync object" do
-          expect { subject }.not_to change(Wow::RealmSync, :count)
+        let!(:auction_data_request) do
+          stub_request(:get, 'http://us.battle.net/auction-data/e44ae1e38fefbe8d879d6af846d0014f/auctions.json').
+            to_return(:status => 200,
+                      :body => auction_data_response,
+                      :headers => { 'Content-Type' => 'application/json'})
         end
 
-        it "doesn't download auction data" do
-          subject
-          expect(auction_data_request).not_to have_been_made
+        context "if the auction data lastModifed is the same
+                                                as the realm last-synced_at"  do
+          before { realm.update last_synced_at: auctions_last_modified }
+
+          it "locates the auction data for the realm" do
+            subject
+            expect(auction_datafile_location_request).to have_been_made.once
+          end
+
+          it "doesn't create a RealmSync object" do
+            expect { subject }.not_to change(Wow::RealmSync, :count)
+          end
+
+          it "doesn't download auction data" do
+            subject
+            expect(auction_data_request).not_to have_been_made
+          end
+
+          it "doesn't create auctions" do
+            expect { subject }.not_to change(Wow::Auction, :count)
+          end
+
+          it "doesn't update the realm last_synced_at" do
+            expect { subject }.not_to change(realm, :last_synced_at)
+          end
+
+          it "updates the realm's last_checked_at" do
+            realm.update last_checked_at: 1.hour.ago
+            subject
+            expect(realm.last_checked_at).to be_within(5.seconds).of(Time.now)
+          end
         end
 
-        it "doesn't create auctions" do
-          expect { subject }.not_to change(Wow::Auction, :count)
-        end
+        context "if the auction data lastModifed is not the same
+                                                as the realm last-synced_at"  do
+          before { realm.update last_synced_at: 2.hours.ago }
+          # Results helpers:
+          let(:sync) { Wow::RealmSync.where(realm_id: realm).last }
 
-        it "doesn't update the realm last_synced_at" do
-          expect { subject }.not_to change(realm, :last_synced_at)
-        end
+          it "creates a RealmSync object" do
+            expect { subject }.to change(Wow::RealmSync, :count).by(1)
+            sync = Wow::RealmSync.last
+            expect(sync.realm).to eq realm
+            expect(sync.created_at).to be_within(5.seconds).of(Time.now)
+          end
 
-        it "updates the realm's last_checked_at" do
-          realm.update last_checked_at: 1.hour.ago
-          subject
-          expect(realm.last_checked_at).to be_within(5.seconds).of(Time.now)
-        end
-      end
+          it "retrieves the auction data" do
+            subject
+            expect(auction_data_request).to have_been_made.once
+          end
 
-      context "if the auction data lastModifed is not the same
-                                              as the realm last-synced_at"  do
-        before { realm.update last_synced_at: 2.hours.ago }
-        let(:sync) { Wow::RealmSync.where(realm_id: realm).last }
+          it "updates the realm last_synced_at" do
+            expect { subject }.to change {
+              realm.last_synced_at.to_i
+            }.to(auctions_last_modified.to_i)
+          end
 
-        it "creates a RealmSync object" do
-          expect { subject }.to change(Wow::RealmSync, :count).by(1)
-          sync = Wow::RealmSync.last
-          expect(sync.realm).to eq realm
-          expect(sync.created_at).to be_within(5.seconds).of(Time.now)
-        end
+          context "when we have no seen any of the auctions before" do
 
-        it "retrieves the auction data" do
-          subject
-          expect(auction_data_request).to have_been_made.once
-        end
-
-        it "updates the realm last_synced_at" do
-          expect { subject }.to change {
-            realm.last_synced_at.to_i
-          }.to(auctions_last_modified.to_i)
-        end
-
-        context "when we have no seen any of the auctions before" do
-
-          it "creates new auctions and auction snapshots" do
-            expect {
+            it "creates new auctions and auction snapshots" do
               expect {
-                subject
-              }.to change(Wow::Auction, :count).by(3)
-            }.to change(Wow::AuctionSnapshot, :count).by(3)
-          end
-
-          it "sets that auction's last_snapshot" do
-            subject
-            expect(Wow::Auction.find_by_auc(1991826120).last_snapshot_id).not_to be_blank
-            expect(Wow::Auction.find_by_auc(1991857830).last_snapshot_id).not_to be_blank
-            expect(Wow::Auction.find_by_auc(1991734081).last_snapshot_id).not_to be_blank
-          end
-
-          it "marks the auctions in_progress" do
-            subject
-            sync = realm.realm_syncs.last
-            sync.auction_snapshots.each do |snapshot|
-              expect(snapshot.auction.status).to eq 'in_progress'
+                expect {
+                  subject
+                }.to change(Wow::Auction, :count).by(3)
+              }.to change(Wow::AuctionSnapshot, :count).by(3)
             end
-          end
 
-          it "attaches the auction snapshots to the RealmSync" do
-            subject
-            expect(Wow::AuctionSnapshot.last.realm_sync).to eq sync
-          end
-
-          context "if we have seem one of the auction items before" do
-            let!(:item) { create :item, blizz_item_id: 74248 }
-            let(:created_auction) { Wow::Auction.find_by_auc 1991826120 }
-            it "attaches the auction to the item" do
+            it "sets that auction's last_snapshot" do
               subject
-              expect(created_auction.item).to eq item
+              expect(Wow::Auction.find_by_auc(1991826120).last_snapshot_id).not_to be_blank
+              expect(Wow::Auction.find_by_auc(1991857830).last_snapshot_id).not_to be_blank
+              expect(Wow::Auction.find_by_auc(1991734081).last_snapshot_id).not_to be_blank
+            end
+
+            it "marks the auctions in_progress" do
+              subject
+              sync = realm.realm_syncs.last
+              sync.auction_snapshots.each do |snapshot|
+                expect(snapshot.auction.status).to eq 'in_progress'
+              end
+            end
+
+            it "attaches the auction snapshots to the RealmSync" do
+              subject
+              expect(Wow::AuctionSnapshot.last.realm_sync).to eq sync
+            end
+
+            context "if we have seem one of the auction items before" do
+              let!(:item) { create :item, blizz_item_id: 74248 }
+              let(:created_auction) { Wow::Auction.find_by_auc 1991826120 }
+              it "attaches the auction to the item" do
+                subject
+                expect(created_auction.item).to eq item
+              end
             end
           end
-        end
 
-        context "when we have seen one of the auctions before" do
-          let!(:auction) {
-            realm.auctions.create!(
-              auction_house: 'horde', auc: 1991826120, blizz_item_id: 74248,
-              owner: 'Banzi', owner_realm: 'Baelgun', buyout: 8750000,
-              quantity: 5, rand: 0, seed: 1208009557
-            )
-          }
-
-          it "doesn't duplicate the auction" do
-            expect { subject }.to change(Wow::Auction, :count).by(2)
-          end
-
-          it "should leave that auction's state as in_progress" do
-            subject
-            expect(auction.status).to eq 'in_progress'
-          end
-
-          it "adds a snapshot to the existing auction" do
-            expect { subject }.to change(auction.snapshots, :count).by(1)
-          end
-
-          it "attaches the auction snapshot to the RealmSync" do
-            subject
-            expect(Wow::AuctionSnapshot.last.realm_sync).to eq sync
-          end
-        end
-
-        context "if this realm has been synced previously" do
-          let!(:last_sync) { realm.realm_syncs.create! }
-
-          context "and there is a snapshot of an auction seen on the last sync run" do
-            let!(:old_auc) {
+          context "when we have seen one of the auctions before" do
+            let!(:auction) {
               realm.auctions.create!(
-                auction_house: 'horde', auc: 1, blizz_item_id: 1,
-                owner: 'Banzi', owner_realm: 'Baelgun', buyout: 1,
-                quantity: 1, rand: 0, seed: 1
+                auction_house: 'horde', auc: 1991826120, blizz_item_id: 74248,
+                owner: 'Banzi', owner_realm: 'Baelgun', buyout: 8750000,
+                quantity: 5, rand: 0, seed: 1208009557
               )
             }
-            let!(:last_ss_of_old_auc) {
-              create :auction_snapshot, auction: old_auc, realm_sync: last_sync, time_left: time_left
-            }
 
-            context "and that last snapshot had time_left LONG" do
-              let(:time_left) { 'LONG' }
-
-              it "should mark auctions that has disappeared as sold" do
-                expect { subject }.to change { old_auc.reload.status }.from('in_progress').to('sold')
-              end
+            it "doesn't duplicate the auction" do
+              expect { subject }.to change(Wow::Auction, :count).by(2)
             end
 
-            context "and that last snapshot had time_left MEDIUM" do
-              let(:time_left) { 'MEDIUM' }
-
-              it "should mark auctions that has disappeared as expired" do
-                expect { subject }.to change { old_auc.reload.status }.from('in_progress').to('expired')
-              end
+            it "should leave that auction's state as in_progress" do
+              subject
+              expect(auction.status).to eq 'in_progress'
             end
 
-            context "and that last snapshot had time_let SHORT" do
-              let(:time_left) { 'SHORT' }
+            it "adds a snapshot to the existing auction" do
+              expect { subject }.to change(auction.snapshots, :count).by(1)
+            end
 
-              it "should mark auctions that has disappeared as expired" do
-                expect { subject }.to change { old_auc.reload.status }.from('in_progress').to('expired')
+            it "attaches the auction snapshot to the RealmSync" do
+              subject
+              expect(Wow::AuctionSnapshot.last.realm_sync).to eq sync
+            end
+          end
+
+          context "if this realm has been synced previously" do
+            let!(:last_sync) { realm.realm_syncs.create! }
+
+            context "and there is a snapshot of an auction seen on the last sync run" do
+              let!(:old_auc) {
+                realm.auctions.create!(
+                  auction_house: 'horde', auc: 1, blizz_item_id: 1,
+                  owner: 'Banzi', owner_realm: 'Baelgun', buyout: 1,
+                  quantity: 1, rand: 0, seed: 1
+                )
+              }
+              let!(:last_ss_of_old_auc) {
+                create :auction_snapshot, auction: old_auc, realm_sync: last_sync, time_left: time_left
+              }
+
+              context "and that last snapshot had time_left LONG" do
+                let(:time_left) { 'LONG' }
+
+                it "should mark auctions that has disappeared as sold" do
+                  expect { subject }.to change { old_auc.reload.status }.from('in_progress').to('sold')
+                end
+              end
+
+              context "and that last snapshot had time_left MEDIUM" do
+                let(:time_left) { 'MEDIUM' }
+
+                it "should mark auctions that has disappeared as expired" do
+                  expect { subject }.to change { old_auc.reload.status }.from('in_progress').to('expired')
+                end
+              end
+
+              context "and that last snapshot had time_let SHORT" do
+                let(:time_left) { 'SHORT' }
+
+                it "should mark auctions that has disappeared as expired" do
+                  expect { subject }.to change { old_auc.reload.status }.from('in_progress').to('expired')
+                end
               end
             end
           end
+        end
+      end
+
+      context "and the auctions file does not exist" do
+        before { realm.update last_synced_at: 2.hours.ago }
+        let!(:auction_data_request) do
+          stub_request(:get, auctions_data_file_url).
+            to_return(:status => 200,
+                      :body => (
+                        '<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN"> <html><head> <title>404 Not Found</title> </head>' +
+                        "<body> <h1>Not Found</h1> <p>The requested URL #{auctions_data_file_url} was not found on this server.</p> </body></html>"
+                      ),
+                      :headers => { 'Content-Type' => 'text/html'})
+        end
+
+        it "doesn't raise an error" do
+          expect { subject }.not_to raise_error
         end
       end
     end

@@ -17,16 +17,10 @@ module Wow
     def sync_auctions
       log "starting"
       raise "realm is not enabled" unless @realm.polling_enabled?
-
-      @realm.update last_checked_at: Time.now
-      if @auctions_file.last_modified_at.to_i == @realm.last_synced_at.to_i
-        message = "skipping %s, auctions file update time is still %d" %
-          [@realm.name, @realm.last_synced_at.to_i]
-        log message, publish: true, log_level: :debug
+      if there_are_new_auctions_to_download?
+        retrieve_and_synchronize_auctions_with_logging
       else
-        log_start
-        retrieve_and_import_auctions
-        log_end
+        log_that_we_are_skipping_this_realm
       end
     end
 
@@ -41,21 +35,66 @@ module Wow
     end
     alias_method_chain :log, :less_args
 
-    def retrieve_and_import_auctions
-      auctions_data = @auctions_file.retrieve_auction_data
+    def there_are_new_auctions_to_download?
+      @realm.update last_checked_at: Time.now
+      @auctions_file.last_modified_at.to_i != @realm.last_synced_at.to_i
+    end
+
+    def log_that_we_are_skipping_this_realm
+      message = "skipping %s, auctions file update time is still %d" %
+        [@realm.name, @realm.last_synced_at.to_i]
+      log message, publish: true, log_level: :debug
+    end
+
+    def catching_normal_errors(&block)
+      begin
+        yield
+      rescue JSON::ParserError => e
+        if e.message =~ /auctions.json was not found on this server/
+          # Blizzard's auction data server doesn't give a 404 for unknown files.
+          # Instead you get an HTML page back that looks something like this:
+          #   <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN"> <html><head>
+          #   <title>404 Not Found</title> </head><body> <h1>Not Found</h1>
+          #   <p>The requested URL /auction-data/9c2f17f8b6a70f0347c5f1145145175d/auctions.json
+          #   was not found on this server.</p> </body></html>
+          log "404: #{@auctions_file.file_location}", publish: true, log_level: :alert
+        else
+          raise
+        end
+      end
+    end
+
+    def retrieve_and_synchronize_auctions_with_logging
+      catching_normal_errors do
+        log_synch_start
+        retrieve_and_synchronize_auctions
+        log_sync_end
+      end
+    end
+
+    def retrieve_and_synchronize_auctions
+      auctions_data = retrieve_auctions
+      synchronize_auctions auctions_data
+    end
+
+    def retrieve_auctions
+      @auctions_file.retrieve_auction_data
+    end
+
+    def synchronize_auctions(auctions_data)
       Wow::Auction.transaction do
         import_auctions auctions_data
         @realm.update last_synced_at: @auctions_file.last_modified_at
       end
     end
 
-    def log_start
+    def log_synch_start
       @start_time = Time.now
       log "Synching %s %d at %s" %
         [@realm.name, @auctions_file.last_modified_at.to_i, @start_time]
     end
 
-    def log_end
+    def log_sync_end
       elapsed_time = Time.now - @start_time
       message = ("Synched %s %d in %.1fs. " +
           "Auctions: %d new, %d sold, %d expired, (%d snapshots).") %

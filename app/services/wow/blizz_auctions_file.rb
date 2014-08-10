@@ -19,11 +19,11 @@ module Wow
       end
     end
 
-    private
-
     def file_location
       metadata['files'].first['url']
     end
+
+    private
 
     def metadata
       @metadata ||= retrieve_metadata
