@@ -22,7 +22,7 @@ module Wow
       if @auctions_file.last_modified_at.to_i == @realm.last_synced_at.to_i
         message = "skipping %s, auctions file update time is still %d" %
           [@realm.name, @realm.last_synced_at.to_i]
-        log message, publish: true
+        log message, publish: true, log_level: :debug
       else
         log_start
         retrieve_and_import_auctions
@@ -68,7 +68,7 @@ module Wow
           @stats[:auctions_expired],
           @stats[:snapshots_created]
         ]
-      log message, publish: true
+      log message, publish: true, log_level: :info
     end
 
     def import_auctions(auctions_data)
